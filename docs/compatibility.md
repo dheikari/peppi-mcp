@@ -38,7 +38,7 @@ The fixture is an internal test format, not a supported university export format
 
 `0.1.0a1` retains the accepted dev3 application behavior; only its reported
 version, release documentation and verification tooling change. The required
-fictional Firefox 157.0.1 / Chrome 155.0.8059.39 matrix passed all 440 tests
+fictional Firefox 157.0.1 / Chrome 155.0.8059.39 matrix passed all 443 tests
 without skips, and three clean installations passed installed stdio checks.
 The initial run's two Firefox startup failures and unchanged successful rerun
 are recorded separately in
@@ -47,4 +47,7 @@ evidence for their listed internal candidates, not a new alpha live session.
 Natural expiry, real second-account switching, Chrome in fresh assistant chats
 and independent human review remain unverified. The initial hosted run was
 rejected for workflow YAML syntax before any tests ran. The correction still
-requires a successful hosted run; see [the alpha record](release-alpha.md).
+requires a successful hosted run. The first executing hosted matrix had 435
+passing and five failing tests; ownership-observer and browser-readiness
+corrections passed the full local 443-test matrix and three clean installations;
+corrected hosted acceptance is still required. See [the alpha record](release-alpha.md).

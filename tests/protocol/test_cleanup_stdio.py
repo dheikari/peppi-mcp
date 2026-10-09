@@ -99,6 +99,24 @@ def owned_handles(record, parent_pid):
         job.Close()
 
 
+def assert_owned_stopped(record, handles):
+    """Verify captured identities and late children in the exact owned job."""
+    import pywintypes
+    import win32job
+    import win32process
+    assert all(win32process.GetExitCodeProcess(h) != 259 for h in handles.values()), "Owned process is still running"
+    try:
+        job = win32job.OpenJobObject(win32job.JOB_OBJECT_QUERY, False, record["fixture_job_name"])
+    except pywintypes.error as exc:
+        if exc.winerror != 2:  # Only ERROR_FILE_NOT_FOUND proves the named job is gone.
+            raise
+        return
+    try:
+        assert win32job.QueryInformationJobObject(job, win32job.JobObjectBasicAccountingInformation)["ActiveProcesses"] == 0, "Owned job still has active processes"
+    finally:
+        job.Close()
+
+
 def test_failed_cleanup_blocks_new_browser_and_explicit_retry_recovers(tmp_path):
     async def run(origin, state):
         control = tmp_path / "cleanup.json"
@@ -226,7 +244,7 @@ def test_shipped_worker_startup_interruption_crosses_stdio(tmp_path, interruptio
                     await call(client, "list_study_rights", error="SIGN_IN_NEEDED")
                     assert not list(root.glob("run-*"))
                     await until(lambda: all(win32process.GetExitCodeProcess(h) != 259 for h in handles.values()))
-                    assert not descendants(owner["pid"])
+                    assert_owned_stopped(owned, handles)
             # Verify before releasing the fictional HTTP response. Exit code 0
             # distinguishes graceful EOF shutdown from a client force-termination.
             assert win32process.GetExitCodeProcess(server_handle) == 0

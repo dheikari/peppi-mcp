@@ -76,12 +76,16 @@ Keep CI synthetic and credential-free. Before release, inspect source, Git
 history, wheels, source archives, metadata and extracted contents. Test documented
 commands from a clean copy. [Contribution guidance](../CONTRIBUTING.md),
 [changelog](../CHANGELOG.md), dependency/license inventory and troubleshooting
-accompany the [alpha preparation](release-alpha.md). The owner selected GitHub private
-vulnerability reporting; its [activation and notification checks](security-reporting.md)
-remain pending until a GitHub repository exists.
+accompany the [alpha preparation](release-alpha.md). GitHub private vulnerability
+reporting and maintainer notification settings are enabled; see
+[the verified scope](security-reporting.md).
 The owner selected MIT for project code. The owner chooses the reviewer and separately authorizes
 publication to GitHub, package/registry upload or external provider review calls.
 Local tests are not independent review.
+
+For the first GitHub alpha, the owner authorized publication and performs Git
+pushes personally. A successful hosted run and verified downloaded asset hashes
+remain required before publishing its packages. No PyPI upload is authorized.
 
 No enrolment, withdrawal or plan edits are in scope. Future mutations require an
 exact preview, explicit supported confirmation, fresh preflight data, duplicate

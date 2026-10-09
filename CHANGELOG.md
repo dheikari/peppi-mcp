@@ -17,15 +17,16 @@ This entry is preparation, not evidence of publication. No PyPI release is inclu
 - Actual stdio and fictional Firefox/Chrome failure regressions, package privacy
   inspection and three clean-install checks.
 - MIT license, contribution guidance, private vulnerability reporting policy and
-  fictional terminal walkthrough. Reporting activation remains a GitHub setup step.
+  fictional terminal walkthrough. Private reporting and maintainer notification
+  settings are enabled; see [the reporting checks](docs/security-reporting.md).
 - Consistent alpha package/server version and stricter release metadata,
   license, document-inclusion and packaged-source checks. Academic tools and
   behavior are unchanged from the accepted dev3 implementation.
 
 Verified support is limited to Windows/Python 3.12 and the documented Lapland
 views. Natural expiry, real second-account switching, Chrome in fresh assistant
-chats and independent human review remain unverified. Hosted CI and private
-reporting activation must be verified before the public prerelease is finalized.
+chats and independent human review remain unverified. Hosted CI must pass before
+the public prerelease is finalized.
 
 ## Internal development candidates
 

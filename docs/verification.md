@@ -1285,3 +1285,50 @@ link, owner-view private form, All Activity subscription and Watching notificati
 channels were verified. No report was submitted; non-owner authenticated form
 submission and actual notification delivery remain untested. No release or tag
 has been created.
+
+## First executing hosted matrix — 9 October 2026
+
+The [hosted run for `f25c982`](https://github.com/dheikari/peppi-mcp/actions/runs/37954638304)
+executed the required Firefox/Chrome suite: **435 passed, 5 failed in 973.76
+seconds**, without skips. Packaging, clean installations and the advisory step
+did not run after pytest failed. The trace shows hosted Python 3.12.10; local
+acceptance used 3.12.14.
+
+One failure was the initial Chrome `connect_personal` call returning a retryable
+error with timeout wording. Its full code and stage were truncated by the test
+assertion; the underlying startup cause remains unestablished. Chrome provisioning
+had downloaded its driver, whereas Firefox provisioning also launched its browser.
+The Chrome step now runs the existing credential-free local isolation probe before
+the full matrix. The production 30-second deadline and all required checks remain
+unchanged. Unexpected tool outcomes now report a fixed, recognized code without
+printing payloads or arbitrary source error strings.
+
+Four startup interruption cases reached their final PPID-descendant assertion
+after verifying that the captured owned process handles had exited and profiles
+were absent. The identity of the remaining descendant was not captured, so it
+must not be classified as a leaked browser or a harmless OS helper on this
+evidence. The fixture already establishes ownership through an exact named
+Windows job; the final observer now checks that job for late children as well
+as the captured process identities, rather than claiming every server descendant.
+An actual Windows regression rejects both a captured survivor and a late owned
+child, then succeeds with an unrelated child still running and untouched.
+
+All eight related cases passed locally unchanged before correction, **8 passed
+in 58.19 seconds**. The observer, safe diagnostics, Chrome probe and affected
+stdio cases then passed together, **12 passed in 62.39 seconds**. Three added
+regressions bring the required matrix to 443 collected cases.
+
+The complete corrected local release command passed **443 tests in 683.15
+seconds**, with both browsers required and no skips. Source/package privacy
+inspection and wheel-core, wheel-live and source-core offline installations
+passed, including actual official-client MCP stdio checks. The selected private
+reference was checked locally in memory; no private markers were printed or
+uploaded. The code/test/tool/lock fingerprint is
+`69f8f5f3cc9f6753bd1df46b8db93821b220d39749e92f7ea55657500b7407d9`.
+The inspected wheel had 42 members and source archive 123. Final documentation
+is rebuilt and audited separately against the committed tree; final artifact
+hashes remain in its external receipt and manifest.
+
+The corrected hosted matrix must still pass before release. No application
+logic or dependency versions were changed, and no new live-account acceptance
+is claimed. The original hosted failure remains part of the evidence.

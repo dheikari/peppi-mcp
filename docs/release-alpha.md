@@ -46,7 +46,7 @@ fingerprint is supplementary evidence. Historical candidates/artifacts remain lo
 
 ## Current state
 
-Local alpha verification passed on 9 October 2026: **440 tests**, both browsers
+Latest local alpha verification passed on 9 October 2026: **443 tests**, both browsers
 required, no skips; wheel-core, wheel-live and source-core offline installations,
 dependency checks, actual MCP stdio smoke tests and the installed fictional demo.
 The full public tree and packages passed privacy inspection, including the
@@ -70,8 +70,20 @@ The [first hosted run](https://github.com/dheikari/peppi-mcp/actions/runs/379526
 was rejected before any job ran: workflow line 39 used an unquoted YAML scalar
 containing `--only-binary=:all:`. An independent YAML parser reproduced the
 failure. Changing that command to a literal block preserves its exact command
-and required checks; the corrected workflow parses locally. Successful hosted
-verification still requires the owner to push the correction.
+and required checks; the corrected workflow parses locally and was accepted
+after the owner's push.
+
+The owner pushed the correction. The [first executing hosted matrix](https://github.com/dheikari/peppi-mcp/actions/runs/37954638304)
+finished with 435 passing and five failing tests. Its initial Chrome connection
+error and overly broad process observer are detailed in
+[the verification record](verification.md#first-executing-hosted-matrix--9-october-2026).
+Twelve focused cases passed locally with the observer/readiness corrections.
+The full corrected local release command then passed **443 tests in 683.15
+seconds**, requiring both browsers without skips, package inspection, three
+offline clean installations and actual stdio checks. The corrected hosted matrix
+must still pass. These changes are
+confined to test infrastructure, CI provisioning and documentation; application
+behavior and dependency pins are unchanged.
 
 No tag or release has been created. The final prerelease remains gated on a
 successful hosted run, refreshed artifacts and downloaded release-asset hashes.

@@ -11,6 +11,7 @@ from mcp.client.stdio import StdioServerParameters
 from tests.local_peppi import local_peppi, PLAN_PATH, version_url
 from peppi_mcp.adapters.lapland_browser import TRANSCRIPT_PATH
 from peppi_mcp.adapters.lapland_study_plan import PREFIX
+from peppi_mcp.worker_protocol import SAFE_ERRORS
 
 pytestmark = pytest.mark.usefixtures("browser_case")
 
@@ -24,7 +25,12 @@ async def call(client, name, args=None, error=None):
     response = await client.call_tool(name, args or {})
     body = response.structured_content
     assert json.loads(response.content[0].text) == body
-    assert response.is_error == (error is not None)
+    if response.is_error != (error is not None):
+        code = body.get("error", {}).get("code")
+        known = set(SAFE_ERRORS) | {"PERSONAL_READ_TIMEOUT", "PERSONAL_READ_FAILED",
+            "PERSONAL_BUSY", "PERSONAL_CLEANUP_PENDING", "SESSION_EXPIRED"}
+        code = code if code in known else "UNEXPECTED_ERROR" if response.is_error else "UNEXPECTED_SUCCESS"
+        raise AssertionError("Unexpected tool outcome: " + name + ": " + code)
     if error:
         assert body["error"]["code"] == error
         assert "PRIVATE_SECRET" not in json.dumps(body)

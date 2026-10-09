@@ -28,7 +28,7 @@
 
 ---
 
-**Unofficial, read-only and experimental.** The current local candidate is
+**Unofficial, read-only and experimental.** The current experimental candidate is
 `0.1.0a1`, prepared for its first experimental GitHub prerelease on Windows 11
 with Python 3.12.14. The verified live connector
 supports University of Lapland accounts. Other institutions and operating systems
@@ -247,7 +247,7 @@ Private reporting and maintainer notifications are enabled. See
 
 | Evidence | Verified scope |
 |---|---|
-| Alpha local checks | 440 tests passed with Firefox and Chrome required, no skips; three clean installations, actual stdio smoke tests, fictional demo and source/package privacy inspection passed. |
+| Alpha local checks | 443 tests passed with Firefox and Chrome required, no skips; three clean installations, actual stdio smoke tests, fictional demo and source/package privacy inspection passed. |
 | Automated dev3 checks | Historical: 398 tests passed with Firefox and Chrome required, no skips; fictional browser/stdio failures, cleanup and privacy checks. |
 | Dev3 packaging | Historical: wheel/source inspection and three offline clean installations passed. |
 | Live Chrome, dev3 | Official stdio MCP client: both rights, all three available HOPS versions, transcript pagination/freshness, sign-out refusal, cleanup and fresh sign-in. |
@@ -257,7 +257,7 @@ These are scoped observations from **one authorized account**, not a guarantee
 for every Peppi installation. Earlier safely refused reads and their limits remain
 in [verification evidence](docs/verification.md). Chrome in fresh assistant chats,
 real second-account switching and natural session expiry remain unverified.
-Hosted CI has not passed yet; its initial workflow syntax failure is recorded in
+Hosted CI has not passed yet; its syntax failure and first executing test failures are recorded in
 [the alpha preparation record](docs/release-alpha.md).
 
 Development and reviews used AI assistants, with owner-directed design and

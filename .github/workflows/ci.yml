@@ -34,6 +34,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -c "from selenium.webdriver.common.selenium_manager import SeleniumManager; from peppi_mcp.browser_runtime import chrome_binary; SeleniumManager().binary_paths(['--browser','chrome','--browser-path',str(chrome_binary()),'--avoid-stats'])"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pytest -q --require-chrome 'tests/test_chrome_runtime.py::test_new_context_has_no_previous_browser_state[chrome]'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Download pinned installation wheels (separate network step)
         shell: pwsh
         run: |

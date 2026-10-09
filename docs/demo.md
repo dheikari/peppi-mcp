@@ -7,7 +7,7 @@ your own HAKA/MFA sign-in in an isolated browser.
 
 ## Walkthrough
 
-After the repository is published, use Git, Windows PowerShell and CPython 3.12:
+Once tag `v0.1.0a1` is available, use Git, Windows PowerShell and CPython 3.12:
 
 ```powershell
 git clone --branch v0.1.0a1 --depth 1 https://github.com/dheikari/peppi-mcp.git
