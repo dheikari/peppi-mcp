@@ -74,3 +74,8 @@ contains project code and its exact MIT notice, not vendored dependency code.
 Dependencies installed separately retain their upstream notices and licenses,
 including certifi's MPL declaration. This inventory is not independent legal
 review of upstream declarations or a promise that no undisclosed vulnerability exists.
+
+The [hosted Windows run on 9 October](https://github.com/dheikari/peppi-mcp/actions/runs/37963403553)
+also completed its separate pip-audit 2.10.1 scan against both unchanged locks,
+reporting no known vulnerabilities. It retained pip-audit's warning recommending
+hash-verified pins; the current locks remain version-pinned without hashes.

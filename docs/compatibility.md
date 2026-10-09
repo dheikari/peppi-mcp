@@ -46,8 +46,10 @@ are recorded separately in
 evidence for their listed internal candidates, not a new alpha live session.
 Natural expiry, real second-account switching, Chrome in fresh assistant chats
 and independent human review remain unverified. The initial hosted run was
-rejected for workflow YAML syntax before any tests ran. The correction still
-requires a successful hosted run. The first executing hosted matrix had 435
-passing and five failing tests; ownership-observer and browser-readiness
-corrections passed the full local 443-test matrix and three clean installations;
-corrected hosted acceptance is still required. See [the alpha record](release-alpha.md).
+rejected for workflow YAML syntax before any tests ran. The first executing
+hosted matrix had 435 passing and five failing tests. After the ownership-observer
+and browser-readiness corrections, the [hosted Windows run for `800ca83`](https://github.com/dheikari/peppi-mcp/actions/runs/37963403553)
+passed all 443 required Firefox/Chrome tests without skips, builds, package
+inspection, three clean installations, actual stdio checks and the advisory
+scan. This verifies the fictional matrix on GitHub's Windows runner; it adds
+no live-account or cross-platform claim. See [the alpha record](release-alpha.md).

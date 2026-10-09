@@ -80,10 +80,24 @@ error and overly broad process observer are detailed in
 Twelve focused cases passed locally with the observer/readiness corrections.
 The full corrected local release command then passed **443 tests in 683.15
 seconds**, requiring both browsers without skips, package inspection, three
-offline clean installations and actual stdio checks. The corrected hosted matrix
-must still pass. These changes are
+offline clean installations and actual stdio checks. These changes are
 confined to test infrastructure, CI provisioning and documentation; application
 behavior and dependency pins are unchanged.
 
-No tag or release has been created. The final prerelease remains gated on a
-successful hosted run, refreshed artifacts and downloaded release-asset hashes.
+The [corrected hosted run for `800ca83`](https://github.com/dheikari/peppi-mcp/actions/runs/37963403553)
+passed on 9 October 2026: **443 tests in 876.42 seconds**, both browsers required,
+no skips. Builds, package/source inspection, all three clean installations,
+actual MCP stdio smoke checks and the separate pip-audit scan passed. Its public
+source-tree and code fingerprints match the audited local candidate exactly.
+A fresh clone of that public revision also reproduced the installed fictional
+demo using the pinned dependencies.
+
+GitHub reported a non-failing warning that the pinned official actions target
+Node.js 20 and were forced to run on Node.js 24. The job completed successfully;
+action-version maintenance remains a follow-up. No warning was suppressed.
+
+Final publication requires a successful run for the final release commit,
+refreshed inspected packages and downloaded release-asset hash verification.
+The publication revision, notes and assets are listed on
+[GitHub Releases](https://github.com/dheikari/peppi-mcp/releases); the external
+local receipt binds the exact source revision and final package hashes.

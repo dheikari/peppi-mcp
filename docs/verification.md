@@ -1332,3 +1332,44 @@ hashes remain in its external receipt and manifest.
 The corrected hosted matrix must still pass before release. No application
 logic or dependency versions were changed, and no new live-account acceptance
 is claimed. The original hosted failure remains part of the evidence.
+
+## Corrected hosted alpha acceptance — 9 October 2026
+
+The [GitHub Windows run for `800ca83`](https://github.com/dheikari/peppi-mcp/actions/runs/37963403553)
+passed **443 tests in 876.42 seconds**, both Firefox and Chrome required, no
+skips. Its overall job succeeded in 18 minutes 34 seconds. The same job built
+the wheel and source archive, inspected privacy/metadata/source correspondence,
+and passed wheel-core, wheel-live and source-core clean installations with
+dependency checks and actual MCP stdio smoke tests. The separate pip-audit
+2.10.1 scan against both unchanged locks reported no known vulnerabilities.
+
+Its audited 115-file public tree fingerprint was
+`2c07f59d0db7ef3f6607bd6f6deedecc4a05c2913b3ea1bad195a0121f33edd4`,
+and its code/test/tool/lock fingerprint was
+`69f8f5f3cc9f6753bd1df46b8db93821b220d39749e92f7ea55657500b7407d9`.
+Both match the locally audited revision. The hosted audit did not receive the
+owner's private reference. Hosted artifacts were built and inspected in the
+job, not retained as downloadable workflow artifacts; final local release
+packages are inspected and identified separately by their manifest and receipt.
+Archive hashes may differ between builds even when inspected source contents
+match; the published download must match the exact final manifest.
+
+A fresh remote clone of `800ca83` compared all 115 public files with the audited
+tree and reproduced the documented installed alpha demo, dependency check,
+four-tool discovery, fictional 15.5-credit summary, unresolved total, expected
+errors and clean stdio shutdown. Dependency installation used the pinned local
+wheel cache; the demo itself used no university or assistant account.
+
+GitHub emitted one non-failing annotation: the pinned official checkout and
+setup-python actions target Node.js 20 and were forced to run on Node.js 24.
+Both succeeded. Action-version maintenance remains a follow-up; no warning or
+check was suppressed. pip-audit also recommended hash-verified dependency pins;
+the version-only lock limitation remains disclosed.
+
+This pass closes the demonstrated hosted test failures for this revision. It
+does not establish the earlier Chrome startup error's cause or the identity of
+the earlier unowned PPID descendant. Application logic and dependency pins are
+unchanged. Final documentation refreshes require package reinspection and a
+hosted pass for the final release commit before publication. Natural expiry,
+real second-account switching, Chrome in fresh assistant chats and independent
+human review remain unverified.

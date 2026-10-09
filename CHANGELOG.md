@@ -1,9 +1,10 @@
 # Changelog
 
-## 0.1.0a1 — Unreleased
+## 0.1.0a1 — Experimental alpha
 
-First intended public **experimental GitHub prerelease**, tagged `v0.1.0a1`.
-This entry is preparation, not evidence of publication. No PyPI release is included.
+First **experimental GitHub prerelease** candidate, intended tag `v0.1.0a1`.
+See [GitHub Releases](https://github.com/dheikari/peppi-mcp/releases) for publication
+status and downloadable assets. No PyPI release is included.
 
 - Read-only MCP tools for study rights, completed achievements and exact decimal
   credit summaries; fictional, imported and opt-in live modes.
@@ -25,8 +26,9 @@ This entry is preparation, not evidence of publication. No PyPI release is inclu
 
 Verified support is limited to Windows/Python 3.12 and the documented Lapland
 views. Natural expiry, real second-account switching, Chrome in fresh assistant
-chats and independent human review remain unverified. Hosted CI must pass before
-the public prerelease is finalized.
+chats and independent human review remain unverified. The corrected hosted
+Windows run passed all 443 tests and release checks; final publication still
+requires the release commit's CI pass and downloaded-asset verification.
 
 ## Internal development candidates
 
