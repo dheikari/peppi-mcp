@@ -1373,3 +1373,67 @@ unchanged. Final documentation refreshes require package reinspection and a
 hosted pass for the final release commit before publication. Natural expiry,
 real second-account switching, Chrome in fresh assistant chats and independent
 human review remain unverified.
+
+## Subsequent hosted timeout-cleanup failure — 9 October 2026
+
+The [run for `01d48e9`](https://github.com/dheikari/peppi-mcp/actions/runs/37966963385)
+finished with **442 passing tests and one failure in 842.30 seconds**, no skips.
+The failed Firefox queue/deadline test observed `read_mechanism: null` and
+`cleanup_pending: true` after `PERSONAL_READ_TIMEOUT`, whereas its immediate
+assertion required cleanup to be complete. The elapsed-time assertion passed.
+Builds, package checks, clean installations and the advisory scan did not run
+after pytest failed. The unchanged single test passed locally in 38.97 seconds.
+Neither observation establishes the underlying hosted cleanup cause; no failure
+category was captured in that run.
+
+The service permits cleanup work to remain active past its separate ten-second
+budget, or to retain resources after a completed failed disposal attempt. Both
+states invalidate records and block a replacement browser. The corrected test
+observes a running guard without resetting its budget, rejects old-data reads,
+and permits one explicit disconnect recovery. A retained failure must be an
+allowlisted filesystem removal error, with the original ownership marker intact
+and captured owned processes already stopped. Ownership/safety refusals,
+unclassified errors and failed recovery remain failures. Physical process exit
+and profile absence must be verified before client EOF, so shutdown cannot rescue
+the assertions. Pending outcomes produce categorized warnings without paths or
+response bodies.
+
+The real 30-second operation, ten-second cleanup and five-second queue deadlines
+are unchanged. The test allows one second for stdio measurement around the first
+two budgets. Two event-controlled fictional unit cases cover active timeout into
+running and failed cleanup, no replacement browser, invalidated identifiers and
+explicit recovery. The intermediate 15-case Firefox/Chrome focus passed in
+115.76 seconds before the last assertion refinements; final verification must use
+the complete frozen matrix. [The Sonnet review](claude-review.md#alpha-timeout-cleanup-review--9-october-2026)
+found no demonstrated production defect and verified closure of two weaknesses
+in the revised tests. Production application files and dependency pins are
+unchanged; no new live-account acceptance is claimed.
+
+## Timeout-cleanup corrected local candidate — 9 October 2026
+
+The frozen corrected release command passed **445 tests in 695.30 seconds**,
+Firefox and Chrome required, no skips. The run observed no pending-cleanup
+warning. It passed build, version/MIT/document-inclusion checks, packaged-source
+correspondence and privacy inspection, followed by wheel-core, wheel-live and
+source-core offline clean installations, dependency checks and actual official
+client MCP stdio smoke tests. Private reference markers were checked locally in
+memory only and were not printed or uploaded.
+
+The tested code/test/tool/lock fingerprint is
+`ab6ef6adabb2c38afe48c064bc74d7a11b8c25b5e20a34747666e3793b07f42c`.
+Only the two reviewed test files changed this fingerprint; application source,
+dependency pins and the workflow are unchanged from `01d48e9`. The final
+documentation refresh is inspected separately against the packages. The external
+receipt binds the committed full tree, three clean installations and artifact
+hashes; the checksum manifest identifies the exact downloadable packages.
+
+The separate pip-audit 2.10.1 scan again found no known vulnerabilities among
+51 pinned distributions, with no skips, suppressions or upgrades. Installed
+license declarations remain present for all pins. Local document rendering,
+links, JSON and PowerShell examples are checked independently. The installed
+fictional demo remains a separate credential-free acceptance check.
+
+This is local verification. The corrected final release commit still requires
+a hosted pass and downloaded-asset verification. The original hosted cleanup
+cause, natural expiry, real second-account switching, Chrome in fresh assistant
+chats and independent human review remain unverified.

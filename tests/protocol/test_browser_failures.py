@@ -1,7 +1,9 @@
 import asyncio
+from contextlib import ExitStack
 import json
 import os
 import sys
+import warnings
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
@@ -33,7 +35,8 @@ async def call(client, name, args=None, error=None):
         raise AssertionError("Unexpected tool outcome: " + name + ": " + code)
     if error:
         assert body["error"]["code"] == error
-        assert "PRIVATE_SECRET" not in json.dumps(body)
+        secret_safe = "PRIVATE_SECRET" not in json.dumps(body)
+        assert secret_safe, "Tool error exposed a fictional secret"
         return body
     assert body["ok"]
     return body["data"]
@@ -199,28 +202,86 @@ def test_account_change_before_during_or_after_acquisition_never_returns_records
 
 def test_real_queue_capacity_expiry_and_active_deadline(tmp_path):
     async def run(origin,state):
-        async with Client(parameters(origin,tmp_path), read_timeout_seconds=45) as client:
-            right = (await connect(client))[0]["id"]
-            args = {"study_right_id":right}
-            # Each fetch is below its 12-second timeout; their combined time
-            # exceeds the service deadline. No production timeout is shortened.
-            state["delay"] = 9
-            started = asyncio.get_running_loop().time()
-            active = asyncio.create_task(call(client,"get_credit_summary",args,error="PERSONAL_READ_TIMEOUT"))
-            await asyncio.sleep(.2)
-            waiting = [asyncio.create_task(call(client,"get_credit_summary",args,error="PERSONAL_BUSY")) for _ in range(4)]
-            await asyncio.sleep(.2)
-            status = await asyncio.wait_for(call(client,"get_connection_status"),2)
-            assert status["queued_requests"] == 4 and status["active_stage"] == "fresh account verification"
-            await asyncio.wait_for(call(client,"get_credit_summary",args,error="PERSONAL_BUSY"),2)
-            await asyncio.wait_for(asyncio.gather(*waiting),6)
-            assert not active.done()
-            assert (await call(client,"get_connection_status"))["queued_requests"] == 0
-            await active
-            elapsed = asyncio.get_running_loop().time() - started
-            assert 29 <= elapsed < 40  # 30 seconds active, separately bounded cleanup.
-            status = await call(client,"get_connection_status")
-            assert status["read_mechanism"] is None and not status["cleanup_pending"]
+        from tests.protocol.test_cleanup_stdio import owned_handles, assert_owned_stopped
+        settings = parameters(origin, tmp_path)
+        record = tmp_path / "owned-processes.json"
+        diagnostic = tmp_path / "cleanup-diagnostic.json"
+        settings.env["PEPPI_FIXTURE_PROCESS_RECORD"] = str(record)
+        settings.env["PEPPI_FIXTURE_CLEANUP_RECORD"] = str(diagnostic)
+        root = tmp_path / "peppi-mcp" / "runtime"
+        with ExitStack() as captured:
+            async with Client(settings, read_timeout_seconds=45) as client:
+                right = (await connect(client))[0]["id"]
+                owned = json.loads(record.read_text())
+                profiles = list(root.glob("run-*"))
+                assert len(profiles) == 1
+                owner = json.loads((profiles[0] / "owner.json").read_text())
+                handles = owned_handles(owned, owner["pid"])
+                for handle in handles.values():
+                    captured.callback(handle.Close)
+                args = {"study_right_id":right}
+                # Each fetch is below its 12-second timeout; their combined time
+                # exceeds the service deadline. No production timeout is shortened.
+                state["delay"] = 9
+                started = asyncio.get_running_loop().time()
+                active = asyncio.create_task(call(client,"get_credit_summary",args,error="PERSONAL_READ_TIMEOUT"))
+                await asyncio.sleep(.2)
+                waiting = [asyncio.create_task(call(client,"get_credit_summary",args,error="PERSONAL_BUSY")) for _ in range(4)]
+                await asyncio.sleep(.2)
+                status = await asyncio.wait_for(call(client,"get_connection_status"),2)
+                assert status["queued_requests"] == 4 and status["active_stage"] == "fresh account verification"
+                await asyncio.wait_for(call(client,"get_credit_summary",args,error="PERSONAL_BUSY"),2)
+                await asyncio.wait_for(asyncio.gather(*waiting),6)
+                assert not active.done()
+                assert (await call(client,"get_connection_status"))["queued_requests"] == 0
+                await active
+                elapsed = asyncio.get_running_loop().time() - started
+                assert 29 <= elapsed < 41  # 30 active + 10 cleanup + 1 stdio measurement margin.
+                status = await call(client,"get_connection_status")
+                assert status["read_mechanism"] is None and status["sign_in_needed"]
+                assert status["personal_connection"] == "unavailable" and status["queued_requests"] == 0
+                assert status["operation_state"] in {"closing", "idle"}
+                if status["operation_state"] == "closing":
+                    assert status["cleanup_pending"] and status["active_stage"] == "owned browser cleanup"
+                pending = status["cleanup_pending"]
+                refused = await client.call_tool("get_credit_summary", args)
+                body = refused.structured_content
+                assert json.loads(refused.content[0].text) == body
+                no_records = "data" not in body
+                assert refused.is_error and not body["ok"]
+                assert no_records, "Refused read returned data"
+                assert body["error"]["code"] in {"PERSONAL_BUSY", "SIGN_IN_NEEDED"}
+                secret_safe = "PRIVATE_SECRET" not in json.dumps(body)
+                assert secret_safe, "Refused read exposed a fictional secret"
+                # Observe a live disposal task without resetting its budget or
+                # retrying the read. An unfinished task must still fail this check.
+                async with asyncio.timeout(11):
+                    while status["operation_state"] == "closing":
+                        status = await call(client, "get_connection_status")
+                        await asyncio.sleep(.02)
+                if pending or status["cleanup_pending"]:
+                    detail = json.loads(diagnostic.read_text()) if diagnostic.exists() else {}
+                    category = detail.get("error_type")
+                    category = category if category in {"PermissionError", "FileNotFoundError", "OSError", "ValueError"} else "unclassified"
+                    winerror = detail.get("winerror")
+                    winerror = winerror if type(winerror) is int else None
+                    warnings.warn("Bounded timeout cleanup pending: " + json.dumps({
+                        "still_pending":status["cleanup_pending"], "profile_error":category,
+                        "winerror":winerror}), RuntimeWarning)
+                    if status["cleanup_pending"]:
+                        assert detail.get("stage") == "profile removal", "Pending cleanup failure was not classified as profile removal"
+                        assert category in {"PermissionError", "OSError"}, "Pending cleanup was not an allowed filesystem refusal"
+                        assert winerror is None or winerror in {5, 32, 33, 145}, "Pending cleanup had an unexpected Windows error category"
+                        assert_owned_stopped(owned, handles)
+                        assert json.loads((profiles[0] / "owner.json").read_text()) == owner
+                # A bounded attempt may retain disposal work. One explicit
+                # disconnect joins it or retries; never retry reads until green.
+                status = await asyncio.wait_for(call(client,"disconnect_personal"), 11)
+                assert not status["cleanup_pending"] and status["operation_state"] == "idle"
+                assert status["personal_connection"] == "signed_out" and status["queued_requests"] == 0
+                await call(client, "get_credit_summary", args, error="SIGN_IN_NEEDED")
+                assert_owned_stopped(owned, handles)
+                assert not list(root.glob("run-*"))
         assert not list((tmp_path/"peppi-mcp"/"runtime").glob("run-*"))
     with local_peppi() as (origin,state): asyncio.run(run(origin,state))
 

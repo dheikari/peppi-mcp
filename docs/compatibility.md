@@ -38,7 +38,7 @@ The fixture is an internal test format, not a supported university export format
 
 `0.1.0a1` retains the accepted dev3 application behavior; only its reported
 version, release documentation and verification tooling change. The required
-fictional Firefox 157.0.1 / Chrome 155.0.8059.39 matrix passed all 443 tests
+fictional Firefox 157.0.1 / Chrome 155.0.8059.39 matrix passed all 445 tests
 without skips, and three clean installations passed installed stdio checks.
 The initial run's two Firefox startup failures and unchanged successful rerun
 are recorded separately in
@@ -51,5 +51,9 @@ hosted matrix had 435 passing and five failing tests. After the ownership-observ
 and browser-readiness corrections, the [hosted Windows run for `800ca83`](https://github.com/dheikari/peppi-mcp/actions/runs/37963403553)
 passed all 443 required Firefox/Chrome tests without skips, builds, package
 inspection, three clean installations, actual stdio checks and the advisory
-scan. This verifies the fictional matrix on GitHub's Windows runner; it adds
-no live-account or cross-platform claim. See [the alpha record](release-alpha.md).
+scan. The subsequent [run for `01d48e9`](https://github.com/dheikari/peppi-mcp/actions/runs/37966963385)
+had 442 passes and one timeout-cleanup assertion failure. Its underlying cleanup
+cause was not captured. The revised test checks the permitted pending-cleanup
+contract and physical disposal before EOF; the final corrected commit still
+requires hosted verification. These fictional checks add no live-account or
+cross-platform claim. See [the alpha record](release-alpha.md).

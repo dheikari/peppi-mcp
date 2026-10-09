@@ -1,4 +1,4 @@
-"""Correctness assertions for the three reproduced candidate cleanup defects."""
+"""Regressions for cleanup ownership, cancellation and bounded recovery."""
 import asyncio
 import threading
 import os
@@ -188,6 +188,64 @@ def test_slow_daemon_removal_outlives_budget_without_losing_guard(tmp_path, monk
         await service.call("connect_personal", NoArguments())
         assert service.state == "awaiting_login"
         await service.close()
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize("pending_kind", ["running", "failed"])
+def test_active_timeout_can_return_pending_cleanup_and_block_reconnect(pending_kind):
+    from peppi_mcp.models import AchievementArguments, ScopedArguments
+    from tests.unit.test_live_service import connected
+
+    async def run():
+        started, release = asyncio.Event(), asyncio.Event()
+        service, browser, right = await connected()
+        page, _ = await service.call("list_achievements", AchievementArguments(study_right_id=right, limit=1))
+        never = asyncio.Event()
+        fail_cleanup = True
+        async def blocked_read(*args):
+            await never.wait()
+        async def blocked_cleanup():
+            started.set()
+            if pending_kind == "failed" and fail_cleanup:
+                raise OSError("PRIVATE_FICTIONAL_LOCK")
+            await release.wait()
+        browser.read, browser.close = blocked_read, blocked_cleanup
+        service.deadline = .05  # Fictional unit clock only.
+        service.cleanup_timeout = .1 if pending_kind == "running" else 1
+        try:
+            with pytest.raises(PeppiError) as error:
+                await service.call("get_credit_summary", ScopedArguments(study_right_id=right))
+            assert error.value.code == "PERSONAL_READ_TIMEOUT"
+            assert started.is_set()
+            status = service.status()
+            assert status["cleanup_pending"] and status["personal_connection"] == "unavailable"
+            assert status["operation_state"] == ("closing" if pending_kind == "running" else "idle")
+            assert status["active_stage"] == ("owned browser cleanup" if pending_kind == "running" else None)
+            assert status["read_mechanism"] is None and status["queued_requests"] == 0
+            assert service.identity is None and not service._pages and not service._plans
+            assert service._retired == [browser]
+            cleanup = service._cleanup_task
+            assert (cleanup is not None and not cleanup.done()) if pending_kind == "running" else cleanup is None
+            for name, args, code in (
+                ("connect_personal", NoArguments(), "PERSONAL_BUSY" if pending_kind == "running" else "PERSONAL_CLEANUP_PENDING"),
+                ("list_achievements", AchievementArguments(study_right_id=right, limit=1, cursor=page["next_cursor"]), "PERSONAL_BUSY" if pending_kind == "running" else "SIGN_IN_NEEDED"),
+            ):
+                with pytest.raises(PeppiError) as refused:
+                    await service.call(name, args)
+                assert refused.value.code == code
+            assert browser.opened == 1
+        finally:
+            fail_cleanup = False
+            release.set()
+            if service._cleanup_task is not None:
+                await asyncio.wait_for(asyncio.shield(service._cleanup_task), 1)
+            await service.call("disconnect_personal", NoArguments())
+        status = service.status()
+        assert not status["cleanup_pending"] and status["operation_state"] == "idle"
+        assert status["personal_connection"] == "signed_out"
+        with pytest.raises(PeppiError) as refused:
+            await service.call("list_achievements", AchievementArguments(study_right_id=right, limit=1, cursor=page["next_cursor"]))
+        assert refused.value.code == "SIGN_IN_NEEDED"
     asyncio.run(run())
 
 

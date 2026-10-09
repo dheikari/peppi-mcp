@@ -79,3 +79,10 @@ The [hosted Windows run on 9 October](https://github.com/dheikari/peppi-mcp/acti
 also completed its separate pip-audit 2.10.1 scan against both unchanged locks,
 reporting no known vulnerabilities. It retained pip-audit's warning recommending
 hash-verified pins; the current locks remain version-pinned without hashes.
+
+The local scan was refreshed after the alpha timeout-cleanup test correction on
+9 October: the same 51 pins, no known vulnerabilities or skipped distributions.
+Installed license declarations still cover every pinned distribution. No
+advisories were ignored and no dependencies were upgraded. The subsequent failed
+hosted run did not reach its advisory step; the corrected commit requires a fresh
+successful hosted run.

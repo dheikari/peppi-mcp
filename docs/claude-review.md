@@ -160,3 +160,37 @@ are closed. [Private security-reporting activation](security-reporting.md),
 independent human review and publication remain separate gates. The owner
 selected MIT and GitHub private reporting on 8 October 2026; the dated review
 evidence above is unchanged.
+
+## Alpha timeout-cleanup review — 9 October 2026
+
+After the `01d48e9` hosted timeout test failed, the owner authorized a focused
+Sonnet 5.5 review. Each pass used an audited 115-file public-source snapshot and
+read-only Read/Glob/Grep tools. No private records, profiles, diagnostic files or
+reference PDF were supplied. Exact `claude-sonnet-5-5` usage was confirmed; the
+reviewer executed no tests and did not delegate.
+
+The first pass (187.3 seconds) found no demonstrated production defect. It
+confirmed that the immediate `cleanup_pending: false` assertion was stricter
+than the bounded-cleanup contract. It also identified how an unrestricted retry
+could conceal a process-stop failure or let EOF cleanup rescue the test. The
+transport test now captures owned process handles before the read, checks old-data
+refusal, and requires process exit and profile removal before EOF. One explicit
+disconnect recovery is permitted; automatic read retries are not added.
+
+The correction review (141.5 seconds) found two concrete weaknesses in those new
+assertions: profile-removal classification alone could admit ownership/safety
+refusals, and failed privacy assertions could print the fictional response.
+The retained-failure branch now allows only `PermissionError` or plain `OSError`,
+with absent or expected Windows filesystem error codes, and preserves exact
+ownership checks. Secret/no-record assertions use booleans without the response
+body. A final focused pass (31.5 seconds) found these two findings closed and no
+demonstrated defect in the correction.
+
+These are source-only conclusions about the inspected cleanup path and test
+changes. The reviewer did not inspect browser launch bodies or run the connector.
+The original hosted cleanup cause remains unverified. Short unit-clock timing,
+late job children outside captured handles, and unchanged JSON-consistency
+assertion output are limited follow-ups, not proven production defects. Final
+runtime verification is recorded in [verification.md](verification.md); the
+corrected release commit still requires hosted CI. This is AI review, not
+independent human security review.

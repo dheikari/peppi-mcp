@@ -46,7 +46,7 @@ fingerprint is supplementary evidence. Historical candidates/artifacts remain lo
 
 ## Current state
 
-Latest local alpha verification passed on 9 October 2026: **443 tests**, both browsers
+Latest local alpha verification passed on 9 October 2026: **445 tests**, both browsers
 required, no skips; wheel-core, wheel-live and source-core offline installations,
 dependency checks, actual MCP stdio smoke tests and the installed fictional demo.
 The full public tree and packages passed privacy inspection, including the
@@ -91,6 +91,30 @@ actual MCP stdio smoke checks and the separate pip-audit scan passed. Its public
 source-tree and code fingerprints match the audited local candidate exactly.
 A fresh clone of that public revision also reproduced the installed fictional
 demo using the pinned dependencies.
+
+The subsequent [run for `01d48e9`](https://github.com/dheikari/peppi-mcp/actions/runs/37966963385)
+finished with **442 passes and one failure in 842.30 seconds**. The Firefox
+active-deadline test observed `cleanup_pending: true`, whereas its immediate
+assertion required false. Builds, installation checks and the advisory scan did
+not run after that failure. The unchanged test passed locally in 38.97 seconds;
+the underlying hosted cleanup cause remains unverified.
+
+The corrected test recognizes bounded cleanup and requires no stale records,
+owned process exit and profile removal before client EOF. Retained failures must
+be classified filesystem refusals with intact ownership, followed by one explicit
+disconnect recovery. Ownership/safety refusals, unexpected error categories and
+unfinished recovery still fail. Two deterministic regressions cover running and
+failed cleanup after the active deadline, including blocked reconnect. Production
+deadlines, cleanup policy, academic behavior and dependency pins are unchanged.
+The focused [Sonnet review](claude-review.md) is source-only; a new hosted pass
+is required for the corrected final commit.
+
+The complete corrected local release command passed **445 tests in 695.30
+seconds**, both browsers required and no skips, plus build/package inspection and
+all three clean installations through actual MCP stdio. The separate advisory
+scan was refreshed: 51 unchanged pins, no known advisories or skipped entries.
+Final documentation is rebuilt and audited with the exact packages; this local
+pass does not replace hosted verification of the final release commit.
 
 GitHub reported a non-failing warning that the pinned official actions target
 Node.js 20 and were forced to run on Node.js 24. The job completed successfully;

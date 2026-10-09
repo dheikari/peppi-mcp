@@ -17,6 +17,9 @@ status and downloadable assets. No PyPI release is included.
   shutdown tasks, tracked deletion, blocked reconnect and explicit pending errors.
 - Actual stdio and fictional Firefox/Chrome failure regressions, package privacy
   inspection and three clean-install checks.
+- Timeout-cleanup regressions preserve pending status and blocked reconnect;
+  transport checks require verified process exit and profile removal before EOF,
+  with one explicit recovery and categorized filesystem diagnostics.
 - MIT license, contribution guidance, private vulnerability reporting policy and
   fictional terminal walkthrough. Private reporting and maintainer notification
   settings are enabled; see [the reporting checks](docs/security-reporting.md).
@@ -26,9 +29,10 @@ status and downloadable assets. No PyPI release is included.
 
 Verified support is limited to Windows/Python 3.12 and the documented Lapland
 views. Natural expiry, real second-account switching, Chrome in fresh assistant
-chats and independent human review remain unverified. The corrected hosted
-Windows run passed all 443 tests and release checks; final publication still
-requires the release commit's CI pass and downloaded-asset verification.
+chats and independent human review remain unverified. Hosted revision `800ca83`
+passed 443 tests and release checks; the subsequent run had one cleanup assertion
+failure. Final publication requires the corrected release commit's hosted pass
+and downloaded-asset verification. See [the alpha record](docs/release-alpha.md).
 
 ## Internal development candidates
 

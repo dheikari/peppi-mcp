@@ -247,8 +247,8 @@ Private reporting and maintainer notifications are enabled. See
 
 | Evidence | Verified scope |
 |---|---|
-| Alpha local checks | 443 tests passed with Firefox and Chrome required, no skips; three clean installations, actual stdio smoke tests, fictional demo and source/package privacy inspection passed. |
-| Alpha hosted checks | [GitHub Windows run](https://github.com/dheikari/peppi-mcp/actions/runs/37963403553): 443 tests passed with both browsers required, no skips; builds, package inspection, three clean installations, stdio checks and dependency advisory scan passed. |
+| Alpha local checks | 445 tests passed with Firefox and Chrome required, no skips; three clean installations, actual stdio smoke tests, fictional demo and source/package privacy inspection passed. |
+| Alpha hosted checks | Historical `800ca83`: [443 tests and release checks passed](https://github.com/dheikari/peppi-mcp/actions/runs/37963403553). The subsequent [run for `01d48e9`](https://github.com/dheikari/peppi-mcp/actions/runs/37966963385) had 442 passes and one timeout-cleanup assertion failure. The corrected release commit still requires a hosted pass. |
 | Automated dev3 checks | Historical: 398 tests passed with Firefox and Chrome required, no skips; fictional browser/stdio failures, cleanup and privacy checks. |
 | Dev3 packaging | Historical: wheel/source inspection and three offline clean installations passed. |
 | Live Chrome, dev3 | Official stdio MCP client: both rights, all three available HOPS versions, transcript pagination/freshness, sign-out refusal, cleanup and fresh sign-in. |
@@ -258,8 +258,8 @@ These are scoped observations from **one authorized account**, not a guarantee
 for every Peppi installation. Earlier safely refused reads and their limits remain
 in [verification evidence](docs/verification.md). Chrome in fresh assistant chats,
 real second-account switching and natural session expiry remain unverified.
-The earlier workflow syntax failure and first executing test failures remain in
-[the alpha preparation record](docs/release-alpha.md), alongside the corrected hosted pass.
+Workflow and test failures remain in [the alpha preparation record](docs/release-alpha.md),
+alongside the passing `800ca83` run and the subsequent cleanup-contract correction.
 
 Development and reviews used AI assistants, with owner-directed design and
 real-account acceptance testing. The [Sonnet review and reproduced cleanup fixes](docs/claude-review.md)
