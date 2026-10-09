@@ -36,7 +36,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Download pinned installation wheels (separate network step)
         shell: pwsh
-        run: python -m pip download --only-binary=:all: -r requirements-dev.lock -r requirements-live.lock -d .verification/wheelhouse
+        run: |
+          python -m pip download --only-binary=:all: -r requirements-dev.lock -r requirements-live.lock -d .verification/wheelhouse
       - name: Test, build, inspect and install through stdio
         shell: pwsh
         env:

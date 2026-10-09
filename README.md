@@ -235,13 +235,13 @@ transcript acquisition fails outright. See [troubleshooting](docs/troubleshootin
 
 ## Security reporting
 
-Report security defects privately through GitHub private vulnerability reporting
-once it is enabled for the published repository. See [the security policy](SECURITY.md)
+Report security defects through [GitHub private vulnerability reporting](https://github.com/dheikari/peppi-mcp/security/advisories/new).
+See [the security policy](SECURITY.md)
 for report contents and maintained versions. Keep credentials and personal study
 records out of reports and public issues.
 
-The channel has been selected; activation and notifications are still pending
-because the repository is local. See [the setup checklist](docs/security-reporting.md).
+Private reporting and maintainer notifications are enabled. See
+[the verification record](docs/security-reporting.md).
 
 ## Verification and release status
 
@@ -256,15 +256,16 @@ because the repository is local. See [the setup checklist](docs/security-reporti
 These are scoped observations from **one authorized account**, not a guarantee
 for every Peppi installation. Earlier safely refused reads and their limits remain
 in [verification evidence](docs/verification.md). Chrome in fresh assistant chats,
-real second-account switching, natural session expiry and hosted CI remain unverified.
+real second-account switching and natural session expiry remain unverified.
+Hosted CI has not passed yet; its initial workflow syntax failure is recorded in
+[the alpha preparation record](docs/release-alpha.md).
 
 Development and reviews used AI assistants, with owner-directed design and
 real-account acceptance testing. The [Sonnet review and reproduced cleanup fixes](docs/claude-review.md)
 are documented; no independent human security review has been completed.
 
-This is a **local experimental candidate**, not a published package. Project code
-is licensed under MIT. GitHub private vulnerability reporting is selected;
-channel activation and publication authorization remain pending.
+The **experimental source repository is public**, licensed under MIT. The alpha
+package prerelease remains pending successful hosted CI and release-asset checks.
 The [alpha preparation record](docs/release-alpha.md) describes the required
 local and hosted checks. `dev0`–`dev3` were internal candidates, not public releases.
 

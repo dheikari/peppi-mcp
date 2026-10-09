@@ -1257,3 +1257,31 @@ manifest. The external receipt binds the complete source revision and public-tre
 fingerprint to those artifacts; earlier code-only fingerprints do not identify
 documentation. This is local alpha acceptance, not evidence of hosted CI or a
 published release. No additional live-account acceptance is claimed.
+
+## Initial GitHub push and workflow correction — 9 October 2026
+
+The owner authorized publication and personally pushed the reviewed initial
+commit `3af00c5f242f311fb6a115ecfd25b83544267ec2`. The remote `main` reference
+matches that local revision, and GitHub associates the commit with `dheikari`.
+Repository-local author and committer settings use the verified GitHub no-reply
+address; global Git settings were not changed.
+
+The [initial hosted run](https://github.com/dheikari/peppi-mcp/actions/runs/37952609801)
+failed workflow validation at line 39; no test job ran. PyYAML 6.0.3, installed
+only in the separate audit environment, reproduced the same scanner error on
+the original file. Converting the wheel-download command to a YAML literal block
+makes it parse as a string without changing its PowerShell command, triggers,
+read-only permissions or required browser checks. Hosted acceptance of the
+corrected workflow remains pending the owner's next push.
+
+The correction passed 42 focused packaging/artwork regressions. Both the YAML
+structure and all six PowerShell workflow scripts parse; the download command
+is unchanged. Rendering and independent parsing checked 23 Markdown documents,
+114 local links, JSON examples and 11 PowerShell examples. The application/test/
+tool/lock fingerprint remains identical to the locally accepted 440-test run.
+
+[Private reporting](security-reporting.md) is enabled. The anonymous public report
+link, owner-view private form, All Activity subscription and Watching notification
+channels were verified. No report was submitted; non-owner authenticated form
+submission and actual notification delivery remain untested. No release or tag
+has been created.

@@ -1,18 +1,26 @@
 # Security reporting setup
 
-## Current status — 8 October 2026
+## Current status — 9 October 2026
 
 The owner selected GitHub private vulnerability reporting. [SECURITY.md](../SECURITY.md)
 defines the channel, maintained candidate, safe report contents and best-effort
 response policy. No public email address is needed for this choice.
 
-The repository has no configured GitHub remote. Private reporting, report-form
-availability and maintainer notifications have **not** been enabled or verified.
-The contact decision is complete; channel activation remains pending.
+The public repository is [dheikari/peppi-mcp](https://github.com/dheikari/peppi-mcp).
+Private reporting is **enabled** in repository settings and the public GitHub API.
+An unauthenticated read of its Advisories page shows **Report a vulnerability**,
+linking to the [private form](https://github.com/dheikari/peppi-mcp/security/advisories/new).
+The form opens in the owner's authenticated browser and describes private
+visibility until publication. No advisory or test report was submitted.
+
+The maintainer watches the repository with **All Activity**. Account notification
+settings for **Watching** include **on GitHub** and **Email**. Delivery of an
+actual report and form submission from a separate non-owner account have not
+been tested. No private email address is published in project documentation.
 
 ## Activation checklist
 
-When the GitHub repository is created under separate publication authorization:
+For future setup or changes, verify these settings again:
 
 1. Confirm its owner and URL; add the verified repository/reporting link to
    `SECURITY.md`. GitHub private vulnerability reporting is available for public

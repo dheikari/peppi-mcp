@@ -60,6 +60,18 @@ were weakened, and no application fix was needed for the successful run.
 
 Final local source revision and artifact hashes are recorded outside the public
 tree in the publication review receipt and `dist/SHA256SUMS.0.1.0a1.txt`.
-GitHub publication, hosted CI, private reporting activation and downloaded release
-asset checks have not occurred. The intended repository and tag URLs remain
-destinations, not claims that they already exist.
+The owner authorized publication and pushed the reviewed initial revision
+`3af00c5f242f311fb6a115ecfd25b83544267ec2` to the public
+[repository](https://github.com/dheikari/peppi-mcp). GitHub attributes it to
+`dheikari`. Private reporting and notification settings are verified as described
+in [the reporting record](security-reporting.md).
+
+The [first hosted run](https://github.com/dheikari/peppi-mcp/actions/runs/37952609801)
+was rejected before any job ran: workflow line 39 used an unquoted YAML scalar
+containing `--only-binary=:all:`. An independent YAML parser reproduced the
+failure. Changing that command to a literal block preserves its exact command
+and required checks; the corrected workflow parses locally. Successful hosted
+verification still requires the owner to push the correction.
+
+No tag or release has been created. The final prerelease remains gated on a
+successful hosted run, refreshed artifacts and downloaded release-asset hashes.

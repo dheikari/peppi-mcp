@@ -2,13 +2,12 @@
 
 ## Private reporting channel
 
-The selected channel is **GitHub private vulnerability reporting** for this
-repository. The project is currently a local experimental candidate: no GitHub
-repository or active reporting endpoint has been verified yet. The maintainer
-must enable and verify private reporting before announcing a public release.
-Adding this file does not enable the GitHub feature.
+Use [GitHub private vulnerability reporting](https://github.com/dheikari/peppi-mcp/security/advisories/new)
+for this repository. Reporting is enabled; the public report link, private form
+and maintainer notification settings were checked on 9 October 2026. See the
+[verification record](docs/security-reporting.md) for the scope of those checks.
 
-Once private reporting is enabled, open the repository's **Security and quality**
+Alternatively, open the repository's **Security and quality**
 tab, select **Advisories**, and choose **Report a vulnerability**. If the button is
 missing, private reporting is unavailable; do not publish sensitive details in an
 issue, discussion or pull request. No fallback email address is configured.

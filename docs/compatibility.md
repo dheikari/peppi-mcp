@@ -45,4 +45,6 @@ are recorded separately in
 [verification.md](verification.md). The live observations in the table remain
 evidence for their listed internal candidates, not a new alpha live session.
 Natural expiry, real second-account switching, Chrome in fresh assistant chats
-and independent human review remain unverified. Hosted CI is pending publication.
+and independent human review remain unverified. The initial hosted run was
+rejected for workflow YAML syntax before any tests ran. The correction still
+requires a successful hosted run; see [the alpha record](release-alpha.md).
