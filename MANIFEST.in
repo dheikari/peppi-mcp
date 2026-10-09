@@ -1,0 +1,7 @@
+include .gitignore .gitattributes LICENSE README.md SECURITY.md CONTRIBUTING.md CHANGELOG.md pyproject.toml requirements-dev.lock requirements-live.lock
+recursive-include docs *.md
+include docs/assets/peppi-mcp-logo.png
+recursive-include tests *.py
+recursive-include tools *.py
+recursive-include .github *.yml
+recursive-include src/peppi_mcp/data *.json

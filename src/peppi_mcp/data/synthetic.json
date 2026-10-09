@@ -1,0 +1,370 @@
+{
+  "id": "synthetic-v1",
+  "study_rights": [
+    {
+      "id": "demo-main",
+      "programme": "Synthetic demonstration demo-main",
+      "official_total": "15.5",
+      "provenance": {
+        "source_id": "demo-main",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-main",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "demo-other",
+      "programme": "Synthetic demonstration demo-other",
+      "official_total": "5",
+      "provenance": {
+        "source_id": "demo-other",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-other",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "demo-ambiguous",
+      "programme": "Synthetic demonstration demo-ambiguous",
+      "official_total": null,
+      "provenance": {
+        "source_id": "demo-ambiguous",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-ambiguous",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "demo-empty",
+      "programme": "Synthetic demonstration demo-empty",
+      "official_total": "0",
+      "provenance": {
+        "source_id": "demo-empty",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-empty",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "demo-partial",
+      "programme": "Synthetic demonstration demo-partial",
+      "official_total": null,
+      "provenance": {
+        "source_id": "demo-partial",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-partial",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "partial",
+        "warnings": []
+      }
+    }
+  ],
+  "achievements": [
+    {
+      "id": "a",
+      "course_id": "DEMO-a",
+      "title": "Synthetic Unicode example: ä, ö, š",
+      "status": "completed",
+      "source_status": "SYNTHETIC_COMPLETED",
+      "kind": "course",
+      "credits": "5",
+      "completed_on": "2026-09-01",
+      "grade": "4",
+      "grading_scale": "0-5",
+      "credit_group_id": "group-a",
+      "provenance": {
+        "source_id": "a",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-main",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "b",
+      "course_id": "DEMO-b",
+      "title": "Synthetic course b",
+      "status": "completed",
+      "source_status": "SYNTHETIC_COMPLETED",
+      "kind": "course",
+      "credits": "2.5",
+      "completed_on": "2026-09-01",
+      "grade": "4",
+      "grading_scale": "0-5",
+      "credit_group_id": "group-b",
+      "provenance": {
+        "source_id": "b",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-main",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "module",
+      "course_id": "DEMO-module",
+      "title": "Synthetic course module",
+      "status": "completed",
+      "source_status": "SYNTHETIC_COMPLETED",
+      "kind": "module",
+      "credits": "7.5",
+      "completed_on": "2026-09-01",
+      "grade": "4",
+      "grading_scale": "0-5",
+      "credit_group_id": "group-module",
+      "provenance": {
+        "source_id": "module",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-main",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      },
+      "component_ids": [
+        "a",
+        "b"
+      ]
+    },
+    {
+      "id": "old",
+      "course_id": "DEMO-REVISED",
+      "title": "Synthetic course old",
+      "status": "completed",
+      "source_status": "SYNTHETIC_COMPLETED",
+      "kind": "course",
+      "credits": "3",
+      "completed_on": "2026-09-01",
+      "grade": "4",
+      "grading_scale": "0-5",
+      "credit_group_id": "revised",
+      "provenance": {
+        "source_id": "old",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-main",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "revised",
+      "course_id": "DEMO-REVISED",
+      "title": "Synthetic course revised",
+      "status": "completed",
+      "source_status": "SYNTHETIC_COMPLETED",
+      "kind": "course",
+      "credits": "4",
+      "completed_on": "2026-09-01",
+      "grade": "5",
+      "grading_scale": "0-5",
+      "credit_group_id": "revised",
+      "provenance": {
+        "source_id": "revised",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-main",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      },
+      "replaces_ids": [
+        "old"
+      ]
+    },
+    {
+      "id": "transfer",
+      "course_id": "DEMO-transfer",
+      "title": "Synthetic course transfer",
+      "status": "completed",
+      "source_status": "SYNTHETIC_COMPLETED",
+      "kind": "transfer",
+      "credits": "4",
+      "completed_on": "2026-09-01",
+      "grade": "HYV",
+      "grading_scale": "HYV/HYL",
+      "credit_group_id": "group-transfer",
+      "provenance": {
+        "source_id": "transfer",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-main",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "failed",
+      "course_id": "DEMO-failed",
+      "title": "Synthetic course failed",
+      "status": "failed",
+      "source_status": "SYNTHETIC_FAILED",
+      "kind": "course",
+      "credits": "5",
+      "completed_on": null,
+      "grade": "0",
+      "grading_scale": "0-5",
+      "credit_group_id": "group-failed",
+      "provenance": {
+        "source_id": "failed",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-main",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "planned",
+      "course_id": "DEMO-planned",
+      "title": "Synthetic course planned",
+      "status": "planned",
+      "source_status": "SYNTHETIC_PLANNED",
+      "kind": "course",
+      "credits": "5",
+      "completed_on": null,
+      "grade": null,
+      "grading_scale": "0-5",
+      "credit_group_id": "group-planned",
+      "provenance": {
+        "source_id": "planned",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-main",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "other",
+      "course_id": "DEMO-other",
+      "title": "Synthetic course other",
+      "status": "completed",
+      "source_status": "SYNTHETIC_COMPLETED",
+      "kind": "course",
+      "credits": "5",
+      "completed_on": "2026-09-01",
+      "grade": "4",
+      "grading_scale": "0-5",
+      "credit_group_id": "group-other",
+      "provenance": {
+        "source_id": "other",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-other",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "repeat1",
+      "course_id": "DEMO-REPEAT",
+      "title": "Synthetic course repeat1",
+      "status": "completed",
+      "source_status": "SYNTHETIC_COMPLETED",
+      "kind": "course",
+      "credits": "6",
+      "completed_on": "2026-09-01",
+      "grade": "4",
+      "grading_scale": "0-5",
+      "credit_group_id": "repeat",
+      "provenance": {
+        "source_id": "repeat1",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-ambiguous",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "repeat2",
+      "course_id": "DEMO-REPEAT",
+      "title": "Synthetic course repeat2",
+      "status": "completed",
+      "source_status": "SYNTHETIC_COMPLETED",
+      "kind": "course",
+      "credits": "6",
+      "completed_on": "2026-09-01",
+      "grade": "4",
+      "grading_scale": "0-5",
+      "credit_group_id": "repeat",
+      "provenance": {
+        "source_id": "repeat2",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-ambiguous",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "unknown-module",
+      "course_id": "DEMO-unknown-module",
+      "title": "Synthetic course unknown-module",
+      "status": "completed",
+      "source_status": "SYNTHETIC_COMPLETED",
+      "kind": "module",
+      "credits": "10",
+      "completed_on": "2026-09-01",
+      "grade": "4",
+      "grading_scale": "0-5",
+      "credit_group_id": "group-unknown-module",
+      "provenance": {
+        "source_id": "unknown-module",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-ambiguous",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "complete",
+        "warnings": []
+      }
+    },
+    {
+      "id": "partial",
+      "course_id": "DEMO-partial",
+      "title": "Synthetic course partial",
+      "status": "completed",
+      "source_status": "SYNTHETIC_COMPLETED",
+      "kind": "course",
+      "credits": "2",
+      "completed_on": "2026-09-01",
+      "grade": "4",
+      "grading_scale": "0-5",
+      "credit_group_id": "group-partial",
+      "provenance": {
+        "source_id": "partial",
+        "institution_id": "synthetic-ulapland",
+        "study_right_id": "demo-partial",
+        "source_mode": "synthetic",
+        "retrieved_at": "2026-10-03T00:00:00+03:00",
+        "completeness": "partial",
+        "warnings": []
+      }
+    }
+  ]
+}

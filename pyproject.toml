@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools==84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "peppi-mcp"
+version = "0.1.0a1"
+description = "Unofficial read-only Peppi MCP: isolated personal browser, public catalogue, transcript imports and synthetic demo"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12,<3.13"
+dependencies = ["mcp==2.3.0", "pydantic==2.13.5", "tzdata==2026.4", "pypdf==6.19.0"]
+
+[project.urls]
+Repository = "https://github.com/dheikari/peppi-mcp"
+Issues = "https://github.com/dheikari/peppi-mcp/issues"
+
+[project.optional-dependencies]
+dev = ["pytest==9.1.1", "build==1.6.1"]
+live = ["selenium==4.43.0", "pywin32==312; sys_platform == 'win32'"]
+
+[project.scripts]
+peppi-mcp = "peppi_mcp.server:main"
+peppi-mcp-demo = "peppi_mcp.demo:main"
+peppi-mcp-import = "peppi_mcp.import_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+peppi_mcp = ["data/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
