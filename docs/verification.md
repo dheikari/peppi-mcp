@@ -1437,3 +1437,53 @@ This is local verification. The corrected final release commit still requires
 a hosted pass and downloaded-asset verification. The original hosted cleanup
 cause, natural expiry, real second-account switching, Chrome in fresh assistant
 chats and independent human review remain unverified.
+
+## Post-release account-change cleanup checks — 10 October 2026
+
+The [first attempt for `accc167`](https://github.com/dheikari/peppi-mcp/actions/runs/38067576608/job/114258246603)
+passed 444 tests and failed one in 862.39 seconds, with no skips. The first
+`connect_personal` in a Firefox account-change case returned
+`PERSONAL_READ_TIMEOUT`, before acquisition or account switching began. That
+unchanged case passed locally in 17.63 seconds. The exact startup cause was not
+captured and remains unverified; the test now records only fixed startup stages
+to distinguish worker launch, browser creation and local-source loading.
+
+The [second attempt](https://github.com/dheikari/peppi-mcp/actions/runs/38067576608/job/114272121058)
+passed 444 tests and failed one in 840.97 seconds, with no skips. This failure
+occurred after the account-change read correctly refused with
+`STUDY_CONTEXT_CHANGED` and cleared its read mechanism. The test incorrectly
+required `cleanup_pending: false` immediately. Neither failed attempt ran the
+subsequent build, installation or advisory checks. The second attempt did not
+capture the underlying cleanup failure category.
+
+A test-only fictional profile-deletion refusal reproduced that assertion
+failure against the original test. The corrected cases verify immediate session
+invalidation, stopped owned processes, retained ownership, blocked replacement
+browsers and one explicit cleanup recovery. Running cleanup is observed without
+resetting its budget. Retained failures must have an allowlisted filesystem
+removal category and intact ownership; unclassified failures remain failures.
+Physical profile absence is required before reconnect or client EOF, and old
+rights and cursors must remain invalid after recovery. Forced deletion refusal
+is tested separately from normal cleanup in both browsers.
+
+Only fictional test infrastructure changed. Production application files,
+dependency pins, browser deadlines and the published `v0.1.0a1` packages are
+unchanged. Startup diagnostics accept a bounded, fixed stage only; response
+bodies, raw URLs, records and browser logs are not emitted. The earlier startup
+timeout is not claimed resolved by these cleanup assertions.
+
+The frozen corrected matrix passed **459 tests in 770.13 seconds**, with Firefox
+and Chrome required, no skips and no warnings. It ran from a fresh local clone
+of `f6ef35f`; its code/test/tool/lock fingerprint matches the working source:
+`7d123adb1f2570e00d2ee95d57b1b1bb09e3c48193839e31573c8a42991e73b5`.
+The complete release command also passed build, version/MIT/document checks,
+packaged-source correspondence and privacy inspection, followed by wheel-core,
+wheel-live and source-core offline clean installations, dependency checks and
+actual MCP stdio smoke tests. Private reference markers were checked locally in
+memory only. The documentation refresh is reinspected separately against the
+final committed source and packages; the external receipts preserve both trees
+and their artifact hashes.
+
+No new live-account acceptance or dependency advisory scan is claimed for these
+test-only changes. The new hosted result remains pending for the final corrected
+commit. The published alpha tag and exact release assets remain unchanged.
