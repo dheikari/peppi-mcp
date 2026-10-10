@@ -23,7 +23,7 @@ def parameters(origin, appdata=None):
                                 env={**os.environ,"PEPPI_FIXTURE_ORIGIN":origin,"PYTHONUTF8":"1",**({"LOCALAPPDATA":str(appdata)} if appdata else {})})
 
 
-async def call(client, name, args=None, error=None):
+async def call(client, name, args=None, error=None, *, startup_record=None):
     response = await client.call_tool(name, args or {})
     body = response.structured_content
     assert json.loads(response.content[0].text) == body
@@ -32,7 +32,10 @@ async def call(client, name, args=None, error=None):
         known = set(SAFE_ERRORS) | {"PERSONAL_READ_TIMEOUT", "PERSONAL_READ_FAILED",
             "PERSONAL_BUSY", "PERSONAL_CLEANUP_PENDING", "SESSION_EXPIRED"}
         code = code if code in known else "UNEXPECTED_ERROR" if response.is_error else "UNEXPECTED_SUCCESS"
-        raise AssertionError("Unexpected tool outcome: " + name + ": " + code)
+        message = "Unexpected tool outcome: " + name + ": " + code
+        if startup_record is not None:
+            message += "; startup stage: " + startup_stage(startup_record)
+        raise AssertionError(message)
     if error:
         assert body["error"]["code"] == error
         secret_safe = "PRIVATE_SECRET" not in json.dumps(body)
@@ -42,10 +45,25 @@ async def call(client, name, args=None, error=None):
     return body["data"]
 
 
-async def connect(client):
+def startup_stage(path):
+    try:
+        with path.open("rb") as stream:
+            raw = stream.read(1025)
+        if len(raw) > 1024:
+            return "unrecorded"
+        data = json.loads(raw)
+        if set(data) == {"stage"} and data["stage"] in {
+                "worker launch", "browser creation", "local source load", "ready"}:
+            return data["stage"]
+    except (OSError, ValueError, TypeError):
+        pass
+    return "unrecorded"
+
+
+async def connect(client, startup_record=None):
     status = await call(client, "get_connection_status")
     assert status["personal_browser"] == os.environ.get("PEPPI_TEST_BROWSER", "firefox")
-    assert (await call(client,"connect_personal"))["personal_connection"] == "awaiting_login"
+    assert (await call(client,"connect_personal", startup_record=startup_record))["personal_connection"] == "awaiting_login"
     assert (await call(client,"connect_personal"))["personal_connection"] == "connected"
     return (await call(client,"list_study_rights"))["items"]
 
@@ -185,18 +203,70 @@ def test_stdio_cancellation_and_client_eof_close_owned_profiles(tmp_path):
 
 
 @pytest.mark.parametrize("change_at", [1, 3, 5])
-def test_account_change_before_during_or_after_acquisition_never_returns_records(change_at):
+@pytest.mark.parametrize("cleanup_refused", [False, True])
+def test_account_change_before_during_or_after_acquisition_never_returns_records(tmp_path, change_at, cleanup_refused):
     async def run(origin,state):
-        async with Client(parameters(origin), read_timeout_seconds=45) as client:
-            right = (await connect(client))[0]["id"]
-            state.update(transcript_reads=0,change_account_at=change_at)
-            await call(client,"list_achievements",{"study_right_id":right},error="STUDY_CONTEXT_CHANGED")
-            status = await call(client,"get_connection_status")
-            assert status["read_mechanism"] is None and not status["cleanup_pending"]
-            new_right = (await connect(client))[0]["id"]
-            assert new_right != right  # Same displayed name, different verified account/session.
-            await call(client,"get_credit_summary",{"study_right_id":right},error="STUDY_RIGHT_NOT_FOUND")
-            await call(client,"disconnect_personal")
+        from tests.protocol.test_cleanup_stdio import update, owned_handles, assert_owned_stopped
+        settings = parameters(origin, tmp_path)
+        record, diagnostic = tmp_path / "owned-processes.json", tmp_path / "cleanup-diagnostic.json"
+        control, startup = tmp_path / "cleanup.json", tmp_path / "startup.json"
+        settings.env.update(PEPPI_FIXTURE_PROCESS_RECORD=str(record),
+            PEPPI_FIXTURE_CLEANUP_RECORD=str(diagnostic), PEPPI_FIXTURE_CLEANUP_CONTROL=str(control),
+            PEPPI_FIXTURE_STARTUP_RECORD=str(startup))
+        update(control, fail=False)
+        root = tmp_path / "peppi-mcp" / "runtime"
+        with ExitStack() as captured:
+            async with Client(settings, read_timeout_seconds=45) as client:
+                right = (await connect(client, startup))[0]["id"]
+                owned = json.loads(record.read_text())
+                profiles = list(root.glob("run-*"))
+                assert len(profiles) == 1
+                owner = json.loads((profiles[0] / "owner.json").read_text())
+                handles = owned_handles(owned, owner["pid"])
+                for handle in handles.values(): captured.callback(handle.Close)
+                first = await call(client, "list_achievements", {"study_right_id":right, "limit":1})
+                update(control, fail=cleanup_refused)
+                state.update(transcript_reads=0,change_account_at=change_at)
+                refused = await call(client,"list_achievements",{"study_right_id":right},error="STUDY_CONTEXT_CHANGED")
+                no_records = "data" not in refused
+                assert no_records, "Account-change refusal returned data"
+                status = await call(client,"get_connection_status")
+                assert status["read_mechanism"] is None and status["sign_in_needed"]
+                # Authentication is discarded immediately; disposal can finish
+                # later or retain a locked profile under the existing contract.
+                async with asyncio.timeout(11):
+                    while status["operation_state"] == "closing":
+                        assert status["active_stage"] == "owned browser cleanup"
+                        await asyncio.sleep(.02)
+                        status = await call(client, "get_connection_status")
+                assert_owned_stopped(owned, handles)
+                if cleanup_refused:
+                    assert status["cleanup_pending"], "Fictional file refusal was not retained"
+                if status["cleanup_pending"]:
+                    detail = json.loads(diagnostic.read_text()) if diagnostic.exists() else {}
+                    assert detail.get("stage") == "profile removal", "Pending cleanup was not a profile refusal"
+                    assert detail.get("error_type") in {"PermissionError", "OSError"}, "Unexpected cleanup failure category"
+                    assert detail.get("winerror") is None or detail["winerror"] in {5, 32, 33, 145}, "Unexpected Windows cleanup error"
+                    assert status["personal_connection"] == "unavailable"
+                    assert json.loads((profiles[0] / "owner.json").read_text()) == owner
+                    if cleanup_refused:
+                        await call(client, "connect_personal", error="PERSONAL_CLEANUP_PENDING")
+                        assert list(root.glob("run-*")) == profiles  # No replacement browser.
+                await call(client, "list_achievements", {"study_right_id":right, "limit":1,
+                    "cursor":first["next_cursor"]}, error="SIGN_IN_NEEDED")
+                update(control, fail=False)
+                status = await asyncio.wait_for(call(client,"disconnect_personal"), 11)
+                assert not status["cleanup_pending"] and status["operation_state"] == "idle"
+                assert status["personal_connection"] == "signed_out" and status["queued_requests"] == 0
+                assert_owned_stopped(owned, handles)
+                assert not list(root.glob("run-*"))  # Verified before EOF or a new browser.
+                new_right = (await connect(client, startup))[0]["id"]
+                assert new_right != right  # Same display name, different verified account/session.
+                await call(client,"get_credit_summary",{"study_right_id":right},error="STUDY_RIGHT_NOT_FOUND")
+                await call(client, "list_achievements", {"study_right_id":new_right, "limit":1,
+                    "cursor":first["next_cursor"]}, error="INVALID_CURSOR")
+                await call(client,"disconnect_personal")
+        assert not list(root.glob("run-*"))
     with local_peppi() as (origin,state): asyncio.run(run(origin,state))
 
 

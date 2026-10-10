@@ -21,6 +21,11 @@ lapland_browser.LaplandBrowser._plan_listing.__defaults__ = (lapland_study_plan.
 # local fixtures, which never contact a university or identity provider.
 lapland_browser.LaplandBrowser._spacing = lambda self: None
 def open_local(self):
+    startup = os.environ.get("PEPPI_FIXTURE_STARTUP_RECORD")
+    def stage(value):
+        if startup:
+            Path(startup).write_text(json.dumps({"stage":value}))
+    stage("browser creation")
     self.driver = open_browser(self.browser_name, headless=True, profile_root=os.environ["PEPPI_OWNED_PROFILE_ROOT"])
     record = os.environ.get("PEPPI_FIXTURE_PROCESS_RECORD")
     if record:
@@ -30,6 +35,8 @@ def open_local(self):
             "worker_pid": os.getpid(),
             "fixture_job_name": Path(record).with_suffix(".job").read_text(),
         }))
+    stage("local source load")
     self.driver.get(origin)
+    stage("ready")
 lapland_browser.LaplandBrowser.open = open_local
 browser_worker.main()

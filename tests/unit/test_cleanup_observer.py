@@ -9,7 +9,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from tests.protocol.test_browser_failures import call
+from tests.protocol.test_browser_failures import call, startup_stage
 
 
 @pytest.mark.parametrize("code,expected", [
@@ -25,6 +25,37 @@ def test_unexpected_tool_outcome_reports_only_a_fixed_code(code, expected):
     with pytest.raises(AssertionError) as caught:
         asyncio.run(call(Client(), "connect_personal"))
     assert str(caught.value) == "Unexpected tool outcome: connect_personal: " + expected
+    assert "PRIVATE_SECRET" not in str(caught.value)
+
+
+@pytest.mark.parametrize("content,expected", [
+    (b'{"stage":"browser creation"}', "browser creation"),
+    (b'{"stage":"PRIVATE_SECRET"}', "unrecorded"),
+    (b'{"stage":["PRIVATE_SECRET"]}', "unrecorded"),
+    (b'{"stage":"ready","url":"PRIVATE_SECRET"}', "unrecorded"),
+    (b'PRIVATE_SECRET', "unrecorded"),
+    (b'{"stage":"ready"}' + b' ' * 2000, "unrecorded"),
+])
+def test_startup_diagnostics_allow_only_a_fixed_stage(tmp_path, content, expected):
+    record = tmp_path / "startup.json"
+    record.write_bytes(content)
+    assert startup_stage(record) == expected
+    assert "PRIVATE_SECRET" not in startup_stage(record)
+
+
+@pytest.mark.parametrize("stage,expected", [("browser creation", "browser creation"),
+                                           ("PRIVATE_SECRET", "unrecorded")])
+def test_failed_connect_includes_only_a_validated_startup_stage(tmp_path, stage, expected):
+    record = tmp_path / "startup.json"
+    record.write_text(json.dumps({"stage":stage}))
+    body = {"ok":False, "error":{"code":"PERSONAL_READ_TIMEOUT", "message":"PRIVATE_SECRET"}}
+    class Client:
+        async def call_tool(self, name, args):
+            return SimpleNamespace(structured_content=body, is_error=True,
+                content=[SimpleNamespace(text=json.dumps(body))])
+    with pytest.raises(AssertionError) as caught:
+        asyncio.run(call(Client(), "connect_personal", startup_record=record))
+    assert str(caught.value) == "Unexpected tool outcome: connect_personal: PERSONAL_READ_TIMEOUT; startup stage: " + expected
     assert "PRIVATE_SECRET" not in str(caught.value)
 
 

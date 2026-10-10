@@ -65,6 +65,9 @@ create = asyncio.create_subprocess_exec
 async def launch(*args, **kwargs):
     if args[-2:] == ("-m","peppi_mcp.browser_worker"):
         args = (*args[:-1],"tests.browser_fixture_worker")
+        startup = os.environ.get("PEPPI_FIXTURE_STARTUP_RECORD")
+        if startup:
+            Path(startup).write_text(json.dumps({"stage":"worker launch"}))
     return await create(*args, **kwargs)
 asyncio.create_subprocess_exec = launch
 main()
