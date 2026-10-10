@@ -1,10 +1,5 @@
 # Moodle and Sisu MCP design references
 
-Reviewed 3 October 2026 after the owner supplied both repositories. This was
-source inspection, not running the projects or independently verifying their
-institutional compatibility. No reference code was copied into this package and
-no reference package/browser service was installed.
-
 The reviewed README and authentication implementations do not document explicit
 vendor or university approval for either MCP. Moodle's documented web-service
 framework and a working user login are technical access evidence, not endorsement
