@@ -16,7 +16,7 @@ from pathlib import Path, PurePosixPath
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = "0.1.0a1"
 RELEASE_DOCUMENTS = ("README.md", "SECURITY.md", "CONTRIBUTING.md", "CHANGELOG.md", "docs/demo.md", "docs/release-alpha.md")
-MIT_LICENSE_SHA256 = "70e1a30bf729f00a07e39a8daf57dc3e5fa9bf264d845a8627fb8e02f78b8a18"
+MIT_LICENSE_SHA256 = "a20526f108ee53ba6b6bb5fb4f60d09929df0c1fb3a257b46128c46ea017a134"
 # Public artwork is explicitly selected and pinned; unrelated images still fail
 # the privacy inspection. A logo replacement needs a new inspected fingerprint.
 PUBLIC_ASSETS = {
