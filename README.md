@@ -28,11 +28,8 @@
 
 ---
 
-**Unofficial, read-only and experimental.** The current experimental candidate is
-`0.1.0a1`, prepared for its first experimental GitHub prerelease on Windows 11
-with Python 3.12.14. The verified live connector
-supports University of Lapland accounts. Other institutions and operating systems
-are not supported by the verified connector.
+ The verified live connector supports University of Lapland accounts. Other institutions and operating systems
+are not yet supported by the verified connector.
 
 ## What it does
 
@@ -51,25 +48,6 @@ Example requests after connecting:
 The connector does **not** enrol you, edit HOPS or change academic records. It
 does not acquire GPA or verified degree-credit requirements, and cannot establish
 graduation eligibility. A displayed HOPS target is not a verified graduation requirement.
-
-## Why discrepancies stay visible
-
-Source conflicts, unresolved matching and unverified curriculum rules are
-different problems. A selected plan or progress response puts a typed
-`assessment` before the detailed records, with separate statuses, limitations,
-compared quantities and exact decimal differences.
-
-For example, in a **fictional illustration**:
-
-> Partial: the HOPS sidebar reports 42 credits inside the plan, while its root
-> groups sum to 40. The transcript reports 42 credits, including 2 credits with
-> no verified plan allocation. That arithmetic could explain the gap, but does
-> not establish its cause or resolve the conflicting source figures.
-
-An unmatched course is not automatically classified as outside the plan.
-Matching totals do not prove that electives, agreements or other degree rules
-are satisfied. See [HOPS and progress](docs/study-plan-progress.md). The default
-fictional demo below exercises transcript and credit tools; it does not expose HOPS tools.
 
 ## Try it without a Peppi account
 
@@ -327,4 +305,3 @@ The software is provided "as is", without warranty, as described in the license.
 commercially, provided you retain the copyright and permission notice.
 Dependencies retain their own licenses; see the [dependency inventory](docs/dependencies.md).
 
-README layout inspired by [Torium](https://github.com/ahnl/torium).
