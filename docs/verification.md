@@ -1138,8 +1138,8 @@ Application package files still match the accepted dev3 wheel byte for byte.
 The historical artifacts and hash manifest remain unchanged; documentation-check
 builds and their hashes are stored separately in ignored verification storage.
 The 398-test browser matrix and live acceptance above were not repeated for this
-presentation change. [Generation prompts](assets/logo-prompts.md) accompany the
-artwork; no additional client, institution or release support is claimed.
+presentation change. No additional client, institution or release support is
+claimed.
 
 ## MIT license and README disclaimer — 8 October 2026
 
