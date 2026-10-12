@@ -1528,3 +1528,29 @@ the observed cleanup outcome. The updated lifecycle/unit selection passed
 **69 tests in 7.65 seconds**. An earlier full run was interrupted after the new
 race was reproduced; no full verification result is claimed for that attempt.
 The final candidate collects 479 required-browser cases.
+
+The frozen correction passed **479 tests in 784.35 seconds**, with Firefox and
+Chrome required, no skips and no warnings. It ran from a fresh local clone of
+`fb688cf`; its code/test/tool/lock fingerprint is
+`47e4e6fd163580322d58b5083c2a4e8103a6ea43df804a19b2c3350e4567e1d2`.
+The unchanged strict timeout recovery assertion and both-browser account-change
+and disconnect/recovery tests passed. A separate focused browser/stdio selection
+passed 16 cases in 222.02 seconds.
+
+The complete release command passed build, version/MIT/document checks,
+packaged-source correspondence and privacy inspection, then wheel-core,
+wheel-live and source-core offline clean installations, dependency checks and
+actual MCP stdio smoke tests. The selected private reference was checked locally
+in memory only. The separate advisory scan found no known vulnerabilities among
+51 pins without skips, suppressions or upgrades; license declarations remain
+available for all pins. Public document rendering, 118 local links and 11
+PowerShell examples passed their independent checks.
+
+The final documentation refresh is reinspected against rebuilt packages.
+External receipts retain the tested revision, final public-tree hash, unchanged
+code fingerprint, artifact hashes and matching installed wheel payload. These
+are unpublished verification artifacts; the published alpha tag and exact
+downloadable files remain unchanged. This is a runtime cleanup correction, so
+the existing live observations retain their original candidate scope. Affected
+fresh live lifecycle acceptance and hosted CI for the corrected commit remain
+pending. No new HAKA session or assistant-client acceptance is claimed here.

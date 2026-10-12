@@ -57,3 +57,14 @@ cause was not captured. The revised test checks the permitted pending-cleanup
 contract and physical disposal before EOF; the final corrected commit still
 requires hosted verification. These fictional checks add no live-account or
 cross-platform claim. See [the alpha record](release-alpha.md).
+
+## Unreleased cleanup correction
+
+The 12 October correction on `main` changes cleanup retry classification and
+disconnect during recovery. Its fictional required Firefox/Chrome matrix passed
+479 tests, package/privacy inspection and three clean installations with actual
+stdio checks. Academic capabilities, client arguments and dependency pins are
+unchanged. The published alpha tag/assets still contain their original code;
+these local corrected packages are not a new release. Prior real-client/live
+observations remain scoped to their listed candidates. Hosted verification and
+affected fresh live lifecycle acceptance for the correction remain pending.

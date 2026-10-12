@@ -247,3 +247,19 @@ excluded-process counts taken before cleanup remain documented limits. A zero
 count cannot rule out later or non-descendant lockers. No production process
 enumeration or external protection changes are introduced. The final focused
 source review and required-browser release verification are recorded separately.
+
+The final focused pass (367.5 seconds, exact Opus 5.5 confirmed) accepted the
+disconnect and observer corrections and found no remaining defect it could trace
+through the shipped backend. It read the full live service and changed
+lifecycle/stdio/diagnostic files, plus relevant backend/storage/server sections;
+it executed no tests. The audited code/test/tool/lock fingerprint was
+`47e4e6fd163580322d58b5083c2a4e8103a6ea43df804a19b2c3350e4567e1d2`.
+
+Two observations remain follow-ups, not closed findings. A cancellation-resistant
+fake backend that raises a generic exception after disconnect could change its
+final reported state/error code; the reviewer found no shipped-backend path,
+because that backend re-raises cancellation. This proposal has not been
+reproduced. A possible Windows sharing race between fixture-control reads and
+replacement writes also lacks reproduction. Neither establishes returned stale
+records or an unsafe deletion. The review does not resolve the unknown hosted
+locker, prior startup timeout, natural expiry or second-account switching.
