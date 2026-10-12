@@ -220,6 +220,13 @@ never the original exception text, path or cause. An exhausted budget retains
 the lease and still blocks replacement browsers. These are cleanup retries,
 not automatic recovery, acquisition or sign-in loops.
 
+A disconnect also invalidates and cancels an active connection waiting for
+recovery, before joining the same cleanup task. Only an explicit generation
+change transfers that task's final-state ownership; an ordinary same-generation
+join preserves its requested denied/expired state. The task and generation must
+match at completion. No waiting connection may open a replacement browser after
+disconnect, and joining callers do not reset the cleanup deadline.
+
 
 A retained live lease also stores its original filesystem identity. It may retry
 non-recursive removal of that same empty directory when final marker restoration

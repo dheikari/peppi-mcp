@@ -84,6 +84,8 @@ class LivePersonal:
         self._generation = 0
         self._cleanup_task = None
         self._cleanup_deadline = 0.0
+        self._cleanup_generation = 0
+        self._cleanup_state = "signed_out"
         self._retired = []
         self._recover = recover
         self._storage_pending = recover is not None
@@ -113,9 +115,6 @@ class LivePersonal:
         self._secret = secrets.token_bytes(32)
 
     async def close(self, state="signed_out"):
-        if self._cleanup_task is not None:
-            await self._wait_cleanup(self._cleanup_task)
-            return
         browser, self.browser = self.browser, None
         self._generation += 1
         self._clear()
@@ -138,8 +137,13 @@ class LivePersonal:
 
     def _start_cleanup(self, state):
         if self._cleanup_task is not None:
+            # A disconnect joining recovery owns the new generation's final state.
+            if self._cleanup_generation != self._generation:
+                self._cleanup_generation = self._generation
+                self._cleanup_state = state
             return self._cleanup_task
-        generation = self._generation
+        self._cleanup_generation = self._generation
+        self._cleanup_state = state
         deadline = asyncio.get_running_loop().time() + self.cleanup_timeout
         self._cleanup_deadline = deadline
         async def cleanup():
@@ -174,9 +178,9 @@ class LivePersonal:
             # Only the task that owns this guard may release it or publish state.
             if self._cleanup_task is done:
                 self._cleanup_task = None
-                if generation == self._generation:
+                if self._cleanup_generation == self._generation:
                     self.cleanup_pending = bool(self._retired) or self._storage_pending
-                    self.state = "unavailable" if self.cleanup_pending else state
+                    self.state = "unavailable" if self.cleanup_pending else self._cleanup_state
         task.add_done_callback(completed)
         return task
 

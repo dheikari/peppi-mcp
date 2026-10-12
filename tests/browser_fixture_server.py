@@ -25,14 +25,14 @@ if process_record:
 # URLs, paths or browser state. They are absent from the packaged worker.
 diagnostic = os.environ.get("PEPPI_FIXTURE_CLEANUP_RECORD")
 if diagnostic:
-    from tests.cleanup_diagnostics import removal_record
+    from tests.cleanup_diagnostics import removal_record, write_cleanup_evidence
     remove_lease = storage.RuntimeLease.remove
     removal_attempts = []
     removal_started = time.monotonic()
     def record_removal(error, path):
         detail = removal_record(error, path, len(removal_attempts) + 1, removal_started)
         removal_attempts.append(detail)
-        Path(diagnostic).write_text(json.dumps({**detail, "attempts":removal_attempts}))
+        write_cleanup_evidence(Path(diagnostic), removal_attempts)
     def diagnostic_removal(self):
         try:
             result = remove_lease(self)

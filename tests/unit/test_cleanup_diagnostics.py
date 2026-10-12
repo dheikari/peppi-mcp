@@ -3,7 +3,7 @@ import json
 import time
 
 from peppi_mcp.runtime_storage import filesystem_path
-from tests.cleanup_diagnostics import cleanup_evidence, removal_record
+from tests.cleanup_diagnostics import cleanup_evidence, removal_record, write_cleanup_evidence
 
 
 def test_extended_windows_path_records_depth_and_never_its_filename(tmp_path):
@@ -15,6 +15,26 @@ def test_extended_windows_path_records_depth_and_never_its_filename(tmp_path):
     assert detail["owned_directory_depth"] == 2 and detail["winerror"] == 32
     assert detail["attempt"] == 6 and not detail["success"]
     assert "PRIVATE_SECRET" not in json.dumps(detail)
+
+
+def test_unwritable_observer_cannot_turn_success_into_cleanup_failure(tmp_path):
+    destination = tmp_path / "directory"
+    destination.mkdir()
+    detail = removal_record(None, tmp_path, 1, time.monotonic())
+    write_cleanup_evidence(destination, [detail])
+    assert destination.is_dir() and not list(destination.iterdir())
+
+
+def test_locked_diagnostic_preserves_previous_complete_evidence(tmp_path, monkeypatch):
+    destination = tmp_path / "evidence.json"
+    original = {"attempts":[{"success":False}]}
+    destination.write_text(json.dumps(original))
+    def refused(*args):
+        raise PermissionError("PRIVATE_SECRET")
+    monkeypatch.setattr(type(destination), "replace", refused)
+    write_cleanup_evidence(destination, [removal_record(None, tmp_path, 2, time.monotonic())])
+    assert json.loads(destination.read_text()) == original
+    assert cleanup_evidence(destination) == original["attempts"]
 
 
 def test_recovery_evidence_separates_attempts_and_records_success(tmp_path):

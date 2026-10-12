@@ -100,6 +100,10 @@ returns retryable `PERSONAL_CLEANUP_PENDING` and directs the caller to retry
 `disconnect_personal`. Failed cleanup reports an unavailable connection. A
 successful explicit disconnect reports signed out with no pending cleanup.
 
+Disconnect invalidates active connection attempts even during retained-resource
+recovery. It joins disposal without resetting the deadline and prevents the
+interrupted connect from opening a new browser after cleanup finishes.
+
 The three original Sonnet review defects have corrected-behavior regressions in
 `tests/unit/test_cleanup_regressions.py`; candidate verification and review status
 are recorded in [claude-review.md](claude-review.md) and [verification.md](verification.md).

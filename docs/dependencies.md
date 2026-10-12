@@ -59,6 +59,11 @@ Project code is licensed under MIT. This records upstream declarations; dependen
 
 ## Advisory findings
 
+On 12 October 2026, the separate pip-audit 2.10.1 check again found no known
+vulnerabilities among the 51 pinned distributions, with no skipped packages,
+suppressions or dependency upgrades. This scan is distinct from fictional tests
+and does not establish absence of unknown vulnerabilities.
+
 On 3 October 2026, [pip-audit](https://pypi.org/project/pip-audit/) 2.10.1 found no known vulnerabilities in either pinned lock.
 The same advisory check was refreshed on 4 October after the Claude compatibility
 update, again with no known vulnerabilities reported for either unchanged lock.

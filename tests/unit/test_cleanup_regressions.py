@@ -14,6 +14,42 @@ from tests.unit.test_live_service import Browser
 import anyio
 
 
+def test_disconnect_during_connect_recovery_prevents_replacement_browser():
+    async def run():
+        started, release, disconnecting = asyncio.Event(), asyncio.Event(), asyncio.Event()
+        created = []
+        class NewBrowser(Browser):
+            def __init__(self):
+                super().__init__()
+                created.append(self)
+        class Retired:
+            cleanup_pending = True
+            async def close(self):
+                started.set()
+                await release.wait()
+                self.cleanup_pending = False
+        service = LivePersonal(NewBrowser)
+        service._retired = [Retired()]
+        service.cleanup_pending = True
+        connecting = asyncio.create_task(service.call("connect_personal", NoArguments()))
+        await started.wait()
+        cleanup = service._cleanup_task
+        async def disconnect():
+            disconnecting.set()
+            return await service.call("disconnect_personal", NoArguments())
+        closing = asyncio.create_task(disconnect())
+        await disconnecting.wait()
+        release.set()
+        result, _ = await asyncio.gather(connecting, closing, return_exceptions=True)
+        assert created == [], "A disconnected recovery opened a replacement browser"
+        assert isinstance(result, PeppiError) and result.code == "SIGN_IN_NEEDED"
+        assert cleanup.done() and service.browser is None and not service._retired
+        status = service.status()
+        assert status["personal_connection"] == "signed_out"
+        assert status["operation_state"] == "idle" and not status["cleanup_pending"]
+    asyncio.run(run())
+
+
 @pytest.mark.skipif(os.name != "nt", reason="Windows profile ownership")
 def test_failed_profile_removal_blocks_reconnect_and_can_be_recovered(tmp_path, monkeypatch):
     created = []

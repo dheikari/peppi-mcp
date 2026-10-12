@@ -232,6 +232,46 @@ def test_cleanup_budget_cancelled_waiter_responsive_status_and_late_completion(t
         asyncio.run(run(origin,state))
 
 
+def test_disconnect_during_explicit_recovery_cancels_connect_without_new_browser(tmp_path):
+    async def run(origin, state):
+        control = tmp_path / "cleanup.json"
+        record = tmp_path / "owned-processes.json"
+        update(control, fail=True)
+        settings = parameters(origin, tmp_path)
+        settings.env.update(PEPPI_FIXTURE_CLEANUP_CONTROL=str(control),
+                            PEPPI_FIXTURE_PROCESS_RECORD=str(record))
+        root = tmp_path / "peppi-mcp" / "runtime"
+        async with Client(settings, read_timeout_seconds=45) as client:
+            await connect(client)
+            owned = record.read_bytes()
+            status = await call(client, "disconnect_personal")
+            assert status["cleanup_pending"] and status["personal_connection"] == "unavailable"
+            control.with_suffix(".started").unlink()
+            update(control, fail=False, block=True)
+            connecting = asyncio.create_task(call(client, "connect_personal", error="SIGN_IN_NEEDED"))
+            await until(lambda: control.with_suffix(".started").exists())
+            closing = asyncio.create_task(call(client, "disconnect_personal"))
+            try:
+                async with asyncio.timeout(2):
+                    while True:
+                        status = await call(client, "get_connection_status")
+                        if status["personal_connection"] == "signed_out":
+                            break  # The disconnect invalidated the generation before disposal ended.
+                        await asyncio.sleep(.02)
+                assert status["operation_state"] == "closing"
+                await call(client, "connect_personal", error="PERSONAL_BUSY")
+            finally:
+                update(control, fail=False, block=False)
+            await connecting
+            status = await closing
+            assert status["personal_connection"] == "signed_out"
+            assert not status["cleanup_pending"] and status["operation_state"] == "idle"
+            assert status["queued_requests"] == 0 and record.read_bytes() == owned
+            assert not list(root.glob("run-*"))
+    with local_peppi() as (origin, state):
+        asyncio.run(run(origin, state))
+
+
 @pytest.mark.parametrize("interruption", ["disconnect", "cancel", "eof"])
 def test_shipped_worker_startup_interruption_crosses_stdio(tmp_path, interruption):
     async def run(origin, state):

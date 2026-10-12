@@ -227,3 +227,23 @@ all test files or documentation. The earlier Firefox startup timeout was outside
 its scope. Its proposed reproductions were subsequently run locally; source-only
 findings are not a hosted pass or independent human security review. The
 correction review and frozen verification are recorded separately.
+
+The correction pass (309.9 seconds, exact Opus 5.5 confirmed) accepted the two
+cleanup corrections after inspecting their production bodies, callers and
+regressions. It found a separate existing race: disconnect joining recovery
+could be ignored while the waiting connect opened a replacement browser. An
+event-controlled regression reproduced that behavior. Disconnect now invalidates
+that generation and cancels acquisition before joining the shared cleanup;
+same-generation joins preserve their original final state. The review also found
+that diagnostic writes could replace production outcomes. An unwritable observer
+reproduced a reported removal error after successful physical deletion. Atomic
+observer writes now suppress their filesystem failures and preserve prior
+complete evidence. Focused lifecycle/unit verification passed 69 cases.
+
+The correction review inspected live service/server wiring, cleanup/storage and
+the changed unit/stdio/diagnostic files, but executed nothing. Startup recovery's
+single explicit attempt, conservative markerless-directory retention and
+excluded-process counts taken before cleanup remain documented limits. A zero
+count cannot rule out later or non-descendant lockers. No production process
+enumeration or external protection changes are introduced. The final focused
+source review and required-browser release verification are recorded separately.

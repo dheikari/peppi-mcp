@@ -27,4 +27,17 @@ def removal_record(error, path, attempt, started):
 def cleanup_evidence(path, *, after=0):
     if not path.exists():
         return []
-    return json.loads(path.read_text()).get("attempts", [])[after:]
+    try:
+        return json.loads(path.read_text()).get("attempts", [])[after:]
+    except (OSError, ValueError):
+        return []
+
+
+def write_cleanup_evidence(path, attempts):
+    """A test observer cannot replace the production outcome it observes."""
+    try:
+        temporary = path.with_suffix(".new")
+        temporary.write_text(json.dumps({**attempts[-1], "attempts":attempts}))
+        temporary.replace(path)
+    except OSError:
+        pass

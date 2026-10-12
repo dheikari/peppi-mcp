@@ -9,9 +9,12 @@
   exposing exception contents. Real fictional Windows locks and changed markers
   reproduce both corrections; stdio tests verify disposal before EOF, fresh
   connections and rejection of old rights and cursors.
+- Disconnect during explicit recovery invalidates a waiting connection before
+  it can open a replacement window, while joining the same owned cleanup task.
 - Fictional CI cleanup evidence separates numbered timeout/recovery attempts,
   success, fixed error categories, relative depth, duration and excluded process
   counts. Academic tools, dependency pins and the published alpha are unchanged.
+  Observer writes are atomic and cannot turn disposal success into a failure.
 
 ## 0.1.0a1 — Experimental alpha
 

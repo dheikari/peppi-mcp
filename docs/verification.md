@@ -1519,3 +1519,12 @@ Dependency pins, browser selection, academic capabilities and the published
 alpha tag/assets are unchanged. The earlier hosted Firefox startup timeout is
 still unverified. A successful hosted run for the corrected commit and any
 affected live lifecycle acceptance remain pending.
+
+Opus's correction review additionally led to a reproduced disconnect-during-
+recovery race and observer-write interference. The service now invalidates an
+active connection before joining cleanup, preserving one task and its original
+deadline. Diagnostic writes are atomic and filesystem failures cannot alter
+the observed cleanup outcome. The updated lifecycle/unit selection passed
+**69 tests in 7.65 seconds**. An earlier full run was interrupted after the new
+race was reproduced; no full verification result is claimed for that attempt.
+The final candidate collects 479 required-browser cases.
