@@ -121,6 +121,12 @@ def recover_abandoned(root=None):
         return True
 
 
+class CleanupFailure(OSError):
+    def __init__(self, *, retryable=False):
+        super().__init__("Owned runtime cleanup failed")
+        self.retryable = retryable
+
+
 class CleanupWorker:
     """One tracked daemon job; cancellation of a waiter never loses its work.
 
@@ -137,16 +143,21 @@ class CleanupWorker:
         loop = asyncio.get_running_loop()
         job = loop.create_future()
         self.job = job
-        def deliver(value, failed):
+        def deliver(value, failed, retryable):
             if not job.done():
-                job.set_result((value, failed))
+                job.set_result((value, failed, retryable))
         def work():
+            retryable = False
             try:
-                value, failed = function(*args), False
-            except BaseException:
-                value, failed = None, True
+                value, failed = function(*args), None
+            except BaseException as exc:
+                value = None
+                failed = "filesystem" if isinstance(exc, OSError) else "refused"
+                # Preserve only a known Windows lock category, never its text/path.
+                code = getattr(exc, "winerror", None)
+                retryable = isinstance(exc, OSError) and type(code) is int and code in (32, 33)
             try:
-                loop.call_soon_threadsafe(deliver, value, failed)
+                loop.call_soon_threadsafe(deliver, value, failed, retryable)
             except RuntimeError:
                 pass  # The server has exited; startup recovery owns the marker.
         try:
@@ -155,9 +166,11 @@ class CleanupWorker:
             self.job = None
             job.cancel()
             raise OSError("Owned cleanup worker could not start") from None
-        value, failed = await asyncio.shield(job)
-        if failed:
-            raise OSError("Owned runtime cleanup failed") from None
+        value, failed, retryable = await asyncio.shield(job)
+        if failed == "refused":
+            raise ValueError("Owned runtime cleanup refused") from None
+        if failed == "filesystem":
+            raise CleanupFailure(retryable=retryable) from None
         return value
 
 

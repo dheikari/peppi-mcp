@@ -25,24 +25,22 @@ if process_record:
 # URLs, paths or browser state. They are absent from the packaged worker.
 diagnostic = os.environ.get("PEPPI_FIXTURE_CLEANUP_RECORD")
 if diagnostic:
+    from tests.cleanup_diagnostics import removal_record
     remove_lease = storage.RuntimeLease.remove
+    removal_attempts = []
+    removal_started = time.monotonic()
+    def record_removal(error, path):
+        detail = removal_record(error, path, len(removal_attempts) + 1, removal_started)
+        removal_attempts.append(detail)
+        Path(diagnostic).write_text(json.dumps({**detail, "attempts":removal_attempts}))
     def diagnostic_removal(self):
         try:
-            return remove_lease(self)
+            result = remove_lease(self)
         except Exception as exc:
-            location = None
-            if getattr(exc, "filename", None):
-                try:
-                    location = len(Path(exc.filename).relative_to(self.path).parts)
-                except ValueError:
-                    pass
-            longest = max((len(str(Path(folder) / name)) for folder, dirs, files in os.walk(self.path)
-                           for name in (*dirs, *files)), default=0)
-            context = exc.__context__
-            Path(diagnostic).write_text(json.dumps({"stage":"profile removal", "error_type":type(exc).__name__, "winerror":getattr(exc,"winerror",None), "owned_directory_depth":location, "longest_path_characters":longest,
-                "context_type":type(context).__name__ if context else None, "context_winerror":getattr(context,"winerror",None),
-                "context_path_characters":len(str(getattr(context,"filename","") or ""))}))
+            record_removal(exc, self.path)
             raise
+        record_removal(None, self.path)
+        return result
     storage.RuntimeLease.remove = diagnostic_removal
 
 # Fault controls are restricted to this test bootstrap, never the shipped worker.
@@ -58,6 +56,14 @@ if control:
             state = json.loads(control.read_text())
         if state.get("fail"):
             raise PermissionError("PRIVATE_SECRET")
+        if state.get("sharing_refusals", 0):
+            state["sharing_refusals"] -= 1
+            temporary = control.with_suffix(".new")
+            temporary.write_text(json.dumps(state))
+            temporary.replace(control)
+            error = PermissionError("PRIVATE_SECRET")
+            error.winerror = 32
+            raise error
         return remove(*args)
     storage.remove_owned = controlled_removal
 

@@ -3,6 +3,7 @@ import asyncio
 import json
 import subprocess
 import threading
+from contextlib import ExitStack
 import pytest
 from mcp import Client
 
@@ -76,6 +77,7 @@ def owned_handles(record, parent_pid):
     assert len(pids) > 3  # Includes real browser subprocesses, beyond its main PID.
     assert {record[k] for k in ("driver_pid", "browser_pid", "worker_pid")} <= set(pids)
     handles = {}
+    record["excluded_descendants"] = 0
     job = win32job.OpenJobObject(win32job.JOB_OBJECT_QUERY, False, record["fixture_job_name"])
     try:
         for pid in pids:
@@ -83,6 +85,7 @@ def owned_handles(record, parent_pid):
                 handles[pid] = win32api.OpenProcess(0x1000, False, pid)
                 if not win32job.IsProcessInJob(handles[pid], job):
                     handles.pop(pid).Close()
+                    record["excluded_descendants"] += 1
             except Exception as exc:
                 if getattr(exc, "winerror", None) != 87:
                     raise
@@ -148,6 +151,45 @@ def test_failed_cleanup_blocks_new_browser_and_explicit_retry_recovers(tmp_path)
         assert not list(root.glob("run-*"))
     with local_peppi() as (origin,state):
         asyncio.run(run(origin,state))
+
+
+def test_sharing_refusal_after_five_attempts_recovers_before_eof_and_invalidates_records(tmp_path):
+    async def run(origin, state):
+        control, record = tmp_path / "cleanup.json", tmp_path / "owned-processes.json"
+        update(control, sharing_refusals=0)
+        settings = parameters(origin, tmp_path)
+        settings.env.update(PEPPI_FIXTURE_CLEANUP_CONTROL=str(control),
+                            PEPPI_FIXTURE_PROCESS_RECORD=str(record))
+        root = tmp_path / "peppi-mcp" / "runtime"
+        with ExitStack() as captured:
+            async with Client(settings, read_timeout_seconds=45) as client:
+                right = (await connect(client))[0]["id"]
+                page = await call(client, "list_achievements", {"study_right_id":right, "limit":1})
+                owned = json.loads(record.read_text())
+                profiles = list(root.glob("run-*"))
+                assert len(profiles) == 1
+                owner = json.loads((profiles[0] / "owner.json").read_text())
+                handles = owned_handles(owned, owner["pid"])
+                for handle in handles.values():
+                    captured.callback(handle.Close)
+                update(control, sharing_refusals=5)
+                status = await call(client, "disconnect_personal")
+                assert json.loads(control.read_text())["sharing_refusals"] == 0
+                assert not status["cleanup_pending"] and status["personal_connection"] == "signed_out"
+                assert status["operation_state"] == "idle" and status["queued_requests"] == 0
+                assert_owned_stopped(owned, handles)
+                assert not list(root.glob("run-*"))  # Before EOF or a replacement browser.
+                await call(client, "list_achievements", {"study_right_id":right, "limit":1,
+                    "cursor":page["next_cursor"]}, error="SIGN_IN_NEEDED")
+                new_right = (await connect(client))[0]["id"]
+                assert new_right != right
+                await call(client, "get_credit_summary", {"study_right_id":right}, error="STUDY_RIGHT_NOT_FOUND")
+                await call(client, "list_achievements", {"study_right_id":new_right, "limit":1,
+                    "cursor":page["next_cursor"]}, error="INVALID_CURSOR")
+                await call(client, "disconnect_personal")
+        assert not list(root.glob("run-*"))
+    with local_peppi() as (origin, state):
+        asyncio.run(run(origin, state))
 
 
 def test_cleanup_budget_cancelled_waiter_responsive_status_and_late_completion(tmp_path):

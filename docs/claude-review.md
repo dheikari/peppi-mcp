@@ -194,3 +194,36 @@ assertion output are limited follow-ups, not proven production defects. Final
 runtime verification is recorded in [verification.md](verification.md); the
 corrected release commit still requires hosted CI. This is AI review, not
 independent human security review.
+
+## Windows cleanup-budget review — 12 October 2026
+
+The owner authorized another review after hosted run `38093837855` failed.
+The first Sonnet attempt could not authenticate and performed no review. After
+the owner renewed sign-in and selected Opus 5.5, the read-only review completed
+in 323.4 seconds over an audited 114-file original public-source snapshot.
+Exact `claude-opus-5-5` usage was confirmed. Read/Glob/Grep were allowed; execution,
+editing, delegation and other connectors were disabled. No private records,
+profiles, reference PDF or diagnostic files were supplied.
+
+The review found premature five-attempt cleanup abandonment and non-filesystem
+refusals flattened into retried filesystem errors. Both now have deterministic
+regressions that fail against the original source: a real fictional Windows file
+lock released on the fifth refusal, and a changed ownership marker. The
+correction uses remaining cleanup budget only for known sharing/lock categories
+and stops non-filesystem refusals immediately. Persistent-lock ownership,
+cancellation guards and blocked reconnect remain required.
+
+The reviewer also identified missing recovery-attempt evidence and extended-path
+depth reporting. Fictional diagnostics now record each attempt and success;
+the final recovery assertion includes only new attempts and safe state/duration
+fields. Non-job descendants are counted, not claimed as owned or stopped.
+No executable names or Restart Manager enumeration are added. The actual hosted
+locker and duration remain unknown, and the timeout warning does not establish
+the final recovery attempt's error category.
+
+The review inspected cleanup/storage, live lifecycle, worker/runtime and relevant
+failure tests. It did not execute tests or inspect the page adapter, import path,
+all test files or documentation. The earlier Firefox startup timeout was outside
+its scope. Its proposed reproductions were subsequently run locally; source-only
+findings are not a hosted pass or independent human security review. The
+correction review and frozen verification are recorded separately.

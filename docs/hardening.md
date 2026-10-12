@@ -82,10 +82,17 @@ are protected. Unknown ownership, junctions and reparse points are refused.
 At most one filesystem cleanup job is active. It runs on a tracked daemon worker;
 if the ten-second wait expires, status remains `closing`, the stage is fixed at
 `owned browser cleanup`, and `cleanup_pending` is true until completion. There is
-no overlapping deletion, replacement browser, automatic retry or authentication
+no overlapping deletion, replacement browser, automatic recovery loop or authentication
 reuse. Normal Firefox profiles, imported records and client tool-result files
 remain outside this boundary. An interrupted process can leave a marker for the
 next startup to recover.
+
+Known Windows sharing/lock violations (`32`/`33`) retry within the same cleanup
+deadline, including after the fifth refusal. Unknown filesystem errors keep the
+five-attempt limit. Ownership and other non-filesystem refusals are not retried
+within an attempt. Only fixed failure classification crosses the worker boundary;
+exception text, paths and causes are discarded. Persistent locks remain pending
+and require an explicit bounded recovery request.
 
 During cleanup, connecting returns `PERSONAL_BUSY`. After a completed failed
 attempt, an explicit connect performs one bounded recovery attempt; failure

@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+- Known Windows sharing and lock violations can use the remaining ten-second
+  cleanup budget after five failed deletions. Persistent failures retain their
+  owned lease and block reconnection; deadlines are unchanged.
+- Ownership and other non-filesystem refusals stop after one attempt without
+  exposing exception contents. Real fictional Windows locks and changed markers
+  reproduce both corrections; stdio tests verify disposal before EOF, fresh
+  connections and rejection of old rights and cursors.
+- Fictional CI cleanup evidence separates numbered timeout/recovery attempts,
+  success, fixed error categories, relative depth, duration and excluded process
+  counts. Academic tools, dependency pins and the published alpha are unchanged.
+
 ## 0.1.0a1 — Experimental alpha
 
 First **experimental GitHub prerelease** candidate, intended tag `v0.1.0a1`.

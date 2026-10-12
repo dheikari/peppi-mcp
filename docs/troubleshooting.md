@@ -58,6 +58,12 @@ failed removal retains its exact owned lease and preserves its marker when
 possible. Only a retained live lease can retry its same verified empty filesystem
 directory if its marker is missing; startup will not infer ownership from emptiness. Cancelled cleanup callers do not reset that budget or release its guard.
 
+Temporary Windows sharing/lock violations use the remaining cleanup budget.
+A lock that persists beyond it remains `cleanup_pending`; retry
+`disconnect_personal` explicitly after the obstruction clears. Ownership
+refusals stop immediately and are never interpreted as temporary file locks.
+No background recovery loop or automatic sign-in/read retry is added.
+
 If filesystem work never returns, stop that connector server and start it again;
 the daemon does not prevent exit, and the next start attempts abandoned-profile
 recovery. A directory with a missing or invalid ownership marker, or an unknown

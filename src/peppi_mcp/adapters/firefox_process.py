@@ -11,7 +11,7 @@ from peppi_mcp.errors import PeppiError
 from peppi_mcp.models import Snapshot
 from peppi_mcp.study_plan_models import PlanListing, PlanSnapshot
 from peppi_mcp.services.live import Identity, SourceRight
-from peppi_mcp.runtime_storage import RuntimeLease, RuntimeLeaseCreationError, CleanupWorker
+from peppi_mcp.runtime_storage import RuntimeLease, RuntimeLeaseCreationError, CleanupWorker, CleanupFailure
 from peppi_mcp.worker_protocol import MAX_REPLY, MAX_REQUEST, SAFE_ERRORS, decode, validate_reply, validate_request
 
 @dataclass
@@ -200,15 +200,18 @@ class FirefoxProcess:
                 record.job = None
             record.process = None
             if lease is not None:
-                for attempt in range(5):
+                failures = 0
+                while True:
                     if loop.time() >= deadline:
                         raise TimeoutError
                     try:
                         await self._cleanup_worker.run(lease.remove)
                         record.lease = self.lease = None
                         break
-                    except OSError:
-                        if attempt == 4 or loop.time() >= deadline:
+                    except OSError as exc:
+                        failures += 1
+                        retryable = isinstance(exc, CleanupFailure) and exc.retryable
+                        if loop.time() >= deadline or (failures >= 5 and not retryable):
                             raise
                         await asyncio.sleep(min(.2, max(0, deadline - loop.time())))
             self._retiring = None

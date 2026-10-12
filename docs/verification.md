@@ -1487,3 +1487,35 @@ and their artifact hashes.
 No new live-account acceptance or dependency advisory scan is claimed for these
 test-only changes. The new hosted result remains pending for the final corrected
 commit. The published alpha tag and exact release assets remain unchanged.
+
+## Windows sharing-violation cleanup correction — 12 October 2026
+
+[Hosted run `38093837855`](https://github.com/dheikari/peppi-mcp/actions/runs/38093837855)
+for `26555a9` passed **458 tests and failed one in 928.24 seconds**, with one
+warning and no skips. The Firefox queue/deadline case failed its final explicit
+disconnect recovery assertion because cleanup remained pending. Provisioning
+succeeded; subsequent build, clean-install and advisory steps did not run.
+The preceding timeout-cleanup warning reported `PermissionError`, Windows code
+`32`. It did not capture the final recovery failure's category, operation state,
+duration or locker. No specific external process is established as the cause.
+
+Two deterministic regressions fail against that original source: deletion stops
+after five refusals even when a real fictional Windows file lock has just been
+released, and a tampered ownership marker is retried five times. The corrected
+worker carries a safe filesystem/refusal classification; only known sharing/lock
+codes may retry beyond five attempts within the unchanged ten-second deadline.
+Non-filesystem refusals stop immediately. Persistent failures retain ownership
+and block reconnect, with no automatic acquisition or recovery loop.
+
+The focused follow-up passed **60 tests in 103.12 seconds**, with Firefox and
+Chrome required and no skips or warnings. It covered real Windows locks,
+ownership refusal, cancellation, observers, privacy and actual MCP stdio disposal,
+old-ID/cursor refusal and reconnection. A subsequent test-only edit also adds
+recovery evidence to the final queue/deadline assertion; frozen full verification
+is recorded separately. Its process-stop/profile-absence requirement remains
+unchanged and must pass before EOF or a replacement browser.
+
+Dependency pins, browser selection, academic capabilities and the published
+alpha tag/assets are unchanged. The earlier hosted Firefox startup timeout is
+still unverified. A successful hosted run for the corrected commit and any
+affected live lifecycle acceptance remain pending.

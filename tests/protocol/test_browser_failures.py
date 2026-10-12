@@ -255,8 +255,15 @@ def test_account_change_before_during_or_after_acquisition_never_returns_records
                 await call(client, "list_achievements", {"study_right_id":right, "limit":1,
                     "cursor":first["next_cursor"]}, error="SIGN_IN_NEEDED")
                 update(control, fail=False)
+                from tests.cleanup_diagnostics import cleanup_evidence
+                prior_attempts = len(cleanup_evidence(diagnostic))
+                recovery_started = asyncio.get_running_loop().time()
                 status = await asyncio.wait_for(call(client,"disconnect_personal"), 11)
-                assert not status["cleanup_pending"] and status["operation_state"] == "idle"
+                recovery = {"operation_state":status["operation_state"],
+                    "elapsed_seconds":round(asyncio.get_running_loop().time() - recovery_started, 3),
+                    "excluded_descendants":owned["excluded_descendants"],
+                    "removal_attempts":cleanup_evidence(diagnostic, after=prior_attempts)}
+                assert not status["cleanup_pending"] and status["operation_state"] == "idle", json.dumps(recovery)
                 assert status["personal_connection"] == "signed_out" and status["queued_requests"] == 0
                 assert_owned_stopped(owned, handles)
                 assert not list(root.glob("run-*"))  # Verified before EOF or a new browser.
@@ -346,8 +353,15 @@ def test_real_queue_capacity_expiry_and_active_deadline(tmp_path):
                         assert json.loads((profiles[0] / "owner.json").read_text()) == owner
                 # A bounded attempt may retain disposal work. One explicit
                 # disconnect joins it or retries; never retry reads until green.
+                from tests.cleanup_diagnostics import cleanup_evidence
+                prior_attempts = len(cleanup_evidence(diagnostic))
+                recovery_started = asyncio.get_running_loop().time()
                 status = await asyncio.wait_for(call(client,"disconnect_personal"), 11)
-                assert not status["cleanup_pending"] and status["operation_state"] == "idle"
+                recovery = {"operation_state":status["operation_state"],
+                    "elapsed_seconds":round(asyncio.get_running_loop().time() - recovery_started, 3),
+                    "excluded_descendants":owned["excluded_descendants"],
+                    "removal_attempts":cleanup_evidence(diagnostic, after=prior_attempts)}
+                assert not status["cleanup_pending"] and status["operation_state"] == "idle", json.dumps(recovery)
                 assert status["personal_connection"] == "signed_out" and status["queued_requests"] == 0
                 await call(client, "get_credit_summary", args, error="SIGN_IN_NEEDED")
                 assert_owned_stopped(owned, handles)

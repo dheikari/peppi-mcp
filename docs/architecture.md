@@ -212,6 +212,14 @@ browser. Explicit disconnect retries retained leases; connect blocks until all
 owned cleanup and startup recovery are verified. Markers survive partial removal.
 Candidate verification, review and live acceptance are tracked separately.
 
+Within that shared deadline, known integer Windows sharing/lock violations
+(`32`/`33`) may retry beyond five failed deletions. Other filesystem failures keep
+the five-attempt limit; ownership and other non-filesystem refusals stop after
+one attempt. The daemon worker carries only the safe category and retry flag,
+never the original exception text, path or cause. An exhausted budget retains
+the lease and still blocks replacement browsers. These are cleanup retries,
+not automatic recovery, acquisition or sign-in loops.
+
 
 A retained live lease also stores its original filesystem identity. It may retry
 non-recursive removal of that same empty directory when final marker restoration
@@ -240,5 +248,5 @@ Windows filesystem validation and removal use extended-length paths. This keeps
 nested Chrome files beyond the legacy path limit visible to ownership and
 reparse-point checks and to recursive removal. Public lease paths and markers
 retain their ordinary form. Long-path handling neither authorizes a different
-directory nor follows a junction. The existing cleanup deadline, retry count,
+directory nor follows a junction. The existing cleanup deadline,
 retained-resource registry and cancellation guards are unchanged.
