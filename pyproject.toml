@@ -34,3 +34,5 @@ peppi_mcp = ["data/*.json"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+# Dump every thread's stack when one test runs this long; the slowest passes in about 40 s.
+faulthandler_timeout = 180

@@ -151,7 +151,8 @@ def main():
     args = parser.parse_args()
     fingerprint = code_fingerprint()
     if not args.artifacts_only:
-        run(sys.executable,"-m","pytest","-q","--require-browser","--require-chrome")
+        # Verbose names each test as it starts, so a hosted timeout shows which one hung.
+        run(sys.executable,"-m","pytest","-v","--durations=25","--require-browser","--require-chrome")
         if code_fingerprint() != fingerprint:
             raise SystemExit("Code changed during verification; rerun against a stable source tree.")
     run(sys.executable,"-m","build","--no-isolation")
