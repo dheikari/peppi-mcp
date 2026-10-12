@@ -204,11 +204,14 @@ def test_slow_daemon_removal_outlives_budget_without_losing_guard(tmp_path, monk
         browser.lease = lease
         service = LivePersonal(Browser)
         service.browser = browser
-        service.cleanup_timeout = .04
+        # Cleanup checks its budget before starting. On a loaded runner a budget of
+        # a few Windows clock ticks (~15.6 ms each on Python 3.12) expired first,
+        # started was never set and the unbounded wait hung CI for 30 minutes.
+        service.cleanup_timeout = 1
         close = asyncio.create_task(service.close())
-        await started.wait()
+        await asyncio.wait_for(started.wait(), 5)
         try:
-            await asyncio.wait_for(close, .3)
+            await asyncio.wait_for(close, 3)
             status = service.status()
             assert status["operation_state"] == "closing" and status["cleanup_pending"]
             assert status["active_stage"] == "owned browser cleanup"
@@ -321,11 +324,11 @@ def test_bounded_startup_recovery_keeps_status_responsive_and_guard_owned():
             assert released.wait(5)
             return False
         service = LivePersonal(Browser, recover=recovery)
-        service.cleanup_timeout = .03
+        service.cleanup_timeout = 1  # Must outlast scheduling delay; see the slow-removal case.
         initialize = asyncio.create_task(service.initialize())
-        await started.wait()
+        await asyncio.wait_for(started.wait(), 5)
         try:
-            await asyncio.wait_for(initialize, .3)
+            await asyncio.wait_for(initialize, 3)
             assert service.status()["cleanup_pending"]
             assert service.status()["operation_state"] == "closing"
             with pytest.raises(PeppiError) as error:
@@ -354,12 +357,12 @@ def test_late_cleanup_keeps_requested_state_and_single_task_ownership(state):
         browser.close = cleanup
         service = LivePersonal(Browser)
         service.browser = browser
-        service.cleanup_timeout = .01
+        service.cleanup_timeout = 1  # Must outlast scheduling delay; see the slow-removal case.
         closing = asyncio.create_task(service.close(state))
-        await entered.wait()
+        await asyncio.wait_for(entered.wait(), 5)
         owned = service._cleanup_task
         assert service._start_cleanup("signed_out") is owned
-        await closing
+        await asyncio.wait_for(closing, 3)
         assert service.state == "unavailable" and service.cleanup_pending
         released.set()
         await owned
